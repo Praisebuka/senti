@@ -46,15 +46,7 @@ export function AppShell({}: AppShellProps) {
   };
 
   const pageTitle =
-    view === "dashboard"
-      ? "Overview"
-      : view === "employees"
-        ? "Employee Payroll Register"
-        : view === "empdetail"
-          ? selected?.name
-          : view === "credential"
-            ? "Credential Verifier"
-            : "Analytics";
+    view === "dashboard" ? "Overview" : view === "employees" ? "Employee Payroll Register" : view === "empdetail" ? selected?.name : view === "credential" ? "Credential Verifier" : "Analytics";
 
   return (
     <div

@@ -218,7 +218,7 @@ export default function LandingPage() {
               Contact
             </a>
 
-            <Link href="/auth/login" style={{ textDecoration: "none" }}>
+            <Link href="/login" style={{ textDecoration: "none" }}>
               <button
                 style={{
                   padding: "10px 24px",
