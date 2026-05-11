@@ -1,14 +1,17 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import Swal from "sweetalert2";
 import { colors } from "@/constants/colors";
 import { Mail, Lock, ArrowRight, AlertCircle, Eye, EyeOff, Loader, User } from "lucide-react";
 import { storageUtils } from "@/utils/localStorage";
+import { useAlert, initSweetAlertStyles } from "@/hooks/useAlert";
 
 export default function RegisterPage() {
   const router = useRouter();
+  const alert = useAlert();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -21,6 +24,11 @@ export default function RegisterPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [focusedField, setFocusedField] = useState<string | null>(null);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
+
+  // Initialize alert styles on mount
+  useEffect(() => {
+    initSweetAlertStyles();
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -55,22 +63,46 @@ export default function RegisterPage() {
     e.preventDefault();
     setError("");
 
-    if (!validateForm()) return;
+    if (!validateForm()) {
+      await alert.showError({
+        title: "Validation Error",
+        message: error,
+      });
+      return;
+    }
 
     setIsLoading(true);
 
-    // Simulate API call
-    setTimeout(() => {
-      // Save registration data to localStorage with 10-minute expiry
-      const registrationData = { 
-        ...formData, 
-        registeredAt: new Date().toISOString() 
-      };
-      storageUtils.saveWithExpiry("registrationData", registrationData);
-      
-      // Redirect to dashboard
-      router.push("/dashboard");
-    }, 1800);
+    // Show loading alert
+    alert.showLoading("Creating your account...");
+
+    // Simulate API call with minimal delay
+    await new Promise((resolve) => {
+      setTimeout(async () => {
+        // Close loading alert
+        Swal.close();
+        
+        // Small delay to ensure loading alert is fully closed
+        await new Promise((innerResolve) => setTimeout(innerResolve, 100));
+
+        // Save registration data to localStorage with 10-minute expiry
+        const registrationData = { 
+          ...formData, 
+          registeredAt: new Date().toISOString() 
+        };
+        storageUtils.saveWithExpiry("registrationData", registrationData);
+
+        // Show success alert and redirect
+        await alert.showSuccess({
+          title: "Registration Successful!",
+          message: `Welcome ${formData.name}! Your account has been created successfully.`,
+        });
+
+        // Redirect to dashboard
+        router.push("/dashboard");
+        resolve(null);
+      }, 800);
+    });
   };
 
   return (
@@ -656,7 +688,7 @@ export default function RegisterPage() {
             <p style={{ fontSize: "14px", color: colors.textSecondary, margin: 0 }}>
               Already have an account?{" "}
               <Link
-                href="/auth/login"
+                href="/login"
                 style={{
                   color: colors.primary,
                   textDecoration: "none",
