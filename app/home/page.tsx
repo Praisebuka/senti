@@ -155,7 +155,7 @@ export default function LandingPage() {
                 (e.target as any).style.transform = "scale(1)";
               }}
             >
-              🛡️ SENTINEL
+              🛡️ CORE CONNECT
             </div>
           </Link>
 
@@ -179,15 +179,14 @@ export default function LandingPage() {
             >
               Features
             </a>
-            <a
-              href="#pricing"
+            <Link
+              href="/how-it-works"
               style={{
                 color: colors.text,
                 textDecoration: "none",
                 fontSize: "14px",
                 fontWeight: "500",
                 transition: "color 0.3s ease",
-                cursor: "pointer",
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.color = colors.primary;
@@ -197,16 +196,33 @@ export default function LandingPage() {
               }}
             >
               How It Works
-            </a>
-            <a
-              href="#contact"
+            </Link>
+            <Link
+              href="/about"
               style={{
                 color: colors.text,
                 textDecoration: "none",
                 fontSize: "14px",
                 fontWeight: "500",
                 transition: "color 0.3s ease",
-                cursor: "pointer",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = colors.primary;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = colors.text;
+              }}
+            >
+              About
+            </Link>
+            <Link
+              href="/contact"
+              style={{
+                color: colors.text,
+                textDecoration: "none",
+                fontSize: "14px",
+                fontWeight: "500",
+                transition: "color 0.3s ease",
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.color = colors.primary;
@@ -216,7 +232,7 @@ export default function LandingPage() {
               }}
             >
               Contact
-            </a>
+            </Link>
 
             <Link href="/login" style={{ textDecoration: "none" }}>
               <button

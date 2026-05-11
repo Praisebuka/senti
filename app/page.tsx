@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 const LandingPage = dynamic(() => import("./home/page"), { ssr: false });
 
 export const metadata: Metadata = {
-  title: "SENTINEL - Squad Payroll Verification",
+  title: "CORE CONNECT - Squad Payroll Verification",
   description: "AI-powered employee payroll verification system",
 };
 

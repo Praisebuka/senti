@@ -141,7 +141,7 @@ export function AppShell({}: AppShellProps) {
                   letterSpacing: 1,
                 }}
               >
-                SENTINEL
+                CORE CONNECT
               </div>
               <div
                 style={{
