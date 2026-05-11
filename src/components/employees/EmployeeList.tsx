@@ -141,8 +141,8 @@ export const EmployeeList: React.FC<EmployeeListProps> = ({ onSelect }) => {
                     style={{
                       fontSize: 11,
                       color: ["TRUSTED", "VERIFIED"].includes(e.verdict)
-                        ? colors.green
-                        : colors.red,
+                        ? colors.success
+                        : colors.error,
                     }}
                   >
                     {squadAction(e.verdict)}

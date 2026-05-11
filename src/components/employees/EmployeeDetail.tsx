@@ -49,7 +49,7 @@ export function EmployeeDetail({ emp, onBack }: EmployeeDetailProps) {
       icon: <Network size={14} />,
       desc: "Shared account/device/editor graph — ring detection via GNN",
     },
-  ];
+  ]; 
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
@@ -133,9 +133,7 @@ export function EmployeeDetail({ emp, onBack }: EmployeeDetailProps) {
           </div>
           <div
             style={{
-              color: ["TRUSTED", "VERIFIED"].includes(emp.verdict)
-                ? colors.green
-                : colors.red,
+              color: ["TRUSTED", "VERIFIED"].includes(emp.verdict) ? colors.success : colors.error,
               fontSize: 16,
               fontWeight: 700,
               marginBottom: 8,
@@ -180,8 +178,8 @@ export function EmployeeDetail({ emp, onBack }: EmployeeDetailProps) {
             <span
               style={{
                 color: ["TRUSTED", "VERIFIED"].includes(emp.verdict)
-                  ? colors.green
-                  : colors.red,
+                  ? colors.success
+                  : colors.error,
               }}
             >
               {["TRUSTED", "VERIFIED"].includes(emp.verdict)
@@ -272,12 +270,12 @@ export function EmployeeDetail({ emp, onBack }: EmployeeDetailProps) {
       {emp.flags.length > 0 && (
         <Card
           style={{
-            border: `1px solid ${colors.red}40`,
+            border: `1px solid ${colors.error}40`,
           }}
         >
           <div
             style={{
-              color: colors.red,
+              color: colors.error,
               fontSize: 11,
               marginBottom: 12,
               display: "flex",
@@ -299,7 +297,7 @@ export function EmployeeDetail({ emp, onBack }: EmployeeDetailProps) {
                   i < emp.flags.length - 1 ? `1px solid ${colors.border}` : "none",
               }}
             >
-              <span style={{ color: colors.red, marginTop: 1 }}>•</span>
+              <span style={{ color: colors.error, marginTop: 1 }}>•</span>
               <span style={{ color: colors.text, fontSize: 13 }}>{f}</span>
             </div>
           ))}
@@ -320,7 +318,7 @@ export function EmployeeDetail({ emp, onBack }: EmployeeDetailProps) {
           onClick={simulate}
           disabled={running}
           style={{
-            background: colors.green,
+            background: colors.success,
             color: "#000",
             fontWeight: 700,
             fontSize: 13,
@@ -369,7 +367,7 @@ export function EmployeeDetail({ emp, onBack }: EmployeeDetailProps) {
                     width: 8,
                     height: 8,
                     borderRadius: "50%",
-                    background: colors.green,
+                    background: colors.success,
                     animation: "pulse 1s infinite",
                   }}
                 />
@@ -382,7 +380,7 @@ export function EmployeeDetail({ emp, onBack }: EmployeeDetailProps) {
           <div
             style={{
               marginTop: 12,
-              color: colors.green,
+              color: colors.success,
               fontSize: 12,
             }}
           >

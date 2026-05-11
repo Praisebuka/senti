@@ -17,9 +17,9 @@ export function CredentialVerifier() {
   const STAGES = ["Classify", "Security Features", "OCR Check", "Forensics", "Authority Lookup"];
 
   const verdictColor = (verdict: Verdict | string) => {
-    if (verdict === "VERIFIED") return colors.green;
+    if (verdict === "VERIFIED") return colors.success;
     if (verdict === "SUSPICIOUS") return "#FF8C00";
-    return colors.red;
+    return colors.error;
   };
 
   const run = () => {
@@ -204,7 +204,7 @@ export function CredentialVerifier() {
           onClick={run}
           disabled={loading || !candNo || !name}
           style={{
-            background: colors.green,
+            background: colors.success,
             color: "#000",
             fontWeight: 700,
             fontSize: 13,
@@ -259,7 +259,7 @@ export function CredentialVerifier() {
                     fontSize: 11,
                     fontWeight: 700,
                     background:
-                      i < step ? colors.green : i === step && loading ? colors.amber : colors.border,
+                      i < step ? colors.success : i === step && loading ? colors.warning : colors.border,
                     color: i < step || (i === step && loading) ? "#000" : colors.muted,
                     transition: "background .4s",
                   }}
@@ -269,7 +269,7 @@ export function CredentialVerifier() {
                 <div
                   style={{
                     color:
-                      i < step ? colors.green : i === step && loading ? colors.amber : colors.muted,
+                      i < step ? colors.success : i === step && loading ? colors.warning : colors.muted,
                     fontSize: 10,
                     textAlign: "center",
                   }}
@@ -328,7 +328,7 @@ export function CredentialVerifier() {
               ].map(([l, v, higher], idx) => {
                 const numValue = typeof v === "number" ? v : 0;
                 const score = (higher ? numValue : 1 - numValue);
-                const col = score >= 0.7 ? colors.green : score >= 0.5 ? colors.amber : colors.red;
+                const col = score >= 0.7 ? colors.success : score >= 0.5 ? colors.warning : colors.error;
                 return (
                   <div
                     key={`stage-${idx}`}
@@ -368,16 +368,16 @@ export function CredentialVerifier() {
                   style={{
                     marginTop: 12,
                     padding: 10,
-                    background: `${colors.red}12`,
+                    background: `${colors.error}12`,
                     borderRadius: 6,
-                    border: `1px solid ${colors.red}30`,
+                    border: `1px solid ${colors.error}30`,
                   }}
                 >
                   {result.issues.map((iss, i) => (
                     <div
                       key={i}
                       style={{
-                        color: colors.red,
+                        color: colors.error,
                         fontSize: 12,
                       }}
                     >
