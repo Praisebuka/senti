@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
   LayoutDashboard,
@@ -23,6 +23,7 @@ import { CredentialVerifier } from "@/components/employees/CredentialVerifier";
 import { Employee } from "@/types";
 import { Card } from "@/components/shared/Card";
 import { storageUtils } from "@/utils/localStorage";
+import { useAlert, initSweetAlertStyles } from "@/hooks/useAlert";
 
 const NAV = [
   {
@@ -45,8 +46,14 @@ interface AppShellProps {}
 
 export function AppShell({}: AppShellProps) {
   const router = useRouter();
+  const alert = useAlert();
   const [view, setView] = useState("dashboard");
   const [selected, setSelected] = useState<Employee | null>(null);
+
+  // Initialize alert styles on mount
+  useEffect(() => {
+    initSweetAlertStyles();
+  }, []);
 
   const handleSelectEmployee = (e: Employee) => {
     setSelected(e);
@@ -58,11 +65,27 @@ export function AppShell({}: AppShellProps) {
     setView("employees");
   };
 
-  const handleSignOut = () => {
-    // Clear all auth data
-    storageUtils.clearAuthData();
-    // Redirect to login
-    router.push("/login");
+  const handleSignOut = async () => {
+    const result = await alert.showConfirm({
+      title: "Sign Out?",
+      message: "Are you sure you want to sign out of your account?",
+      confirmText: "Yes, Sign Out",
+      cancelText: "Cancel",
+    });
+
+    if (result.isConfirmed) {
+      // Clear all auth data
+      storageUtils.clearAuthData();
+      
+      // Show goodbye message and redirect
+      await alert.showSuccess({
+        title: "Signed Out",
+        message: "You have been successfully signed out. Redirecting to login...",
+      });
+      
+      // Redirect to login
+      router.push("/login");
+    }
   };
 
   const pageTitle =

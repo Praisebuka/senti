@@ -1,14 +1,17 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import Swal from "sweetalert2";
 import { colors } from "@/constants/colors";
 import { Mail, Lock, ArrowRight, AlertCircle, Eye, EyeOff, Loader } from "lucide-react";
 import { storageUtils } from "@/utils/localStorage";
+import { useAlert, initSweetAlertStyles } from "@/hooks/useAlert";
 
 export default function LoginPage() {
   const router = useRouter();
+  const alert = useAlert();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -16,25 +19,53 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [focusedField, setFocusedField] = useState<string | null>(null);
 
+  // Initialize alert styles on mount
+  useEffect(() => {
+    initSweetAlertStyles();
+  }, []);
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setIsLoading(true);
 
-    // Simulate API call
-    setTimeout(() => {
-      if (email && password) {
+    if (!email || !password) {
+      setError("Please fill in all fields");
+      setIsLoading(false);
+      await alert.showError({
+        title: "Missing Fields",
+        message: "Please enter both email and password",
+      });
+      return;
+    }
+
+    // Show loading alert
+    alert.showLoading("Signing in...");
+
+    // Simulate API call with minimal delay
+    await new Promise((resolve) => {
+      setTimeout(async () => {
+        // Close loading alert
+        Swal.close();
+        
+        // Small delay to ensure loading alert is fully closed
+        await new Promise((innerResolve) => setTimeout(innerResolve, 100));
+
         // Save login data to localStorage with 10-minute expiry
         const loginData = { email, password, loginTime: new Date().toISOString() };
         storageUtils.saveWithExpiry("loginData", loginData);
-        
+
+        // Show success alert and redirect
+        await alert.showSuccess({
+          title: "Login Successful!",
+          message: `Welcome back! You're being redirected to your dashboard.`,
+        });
+
         // Redirect to dashboard
         router.push("/dashboard");
-      } else {
-        setError("Please fill in all fields");
-        setIsLoading(false);
-      }
-    }, 1500);
+        resolve(null);
+      }, 800);
+    });
   };
 
   return (
