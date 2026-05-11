@@ -20,11 +20,27 @@ export const colors = {
   successDim:  "#00C37420",
   successMid:  "#00C37440",
   error:       "#FF4D6A",              // Red for errors
+  errorDim:    "#FF4D6A20",
+  errorMid:    "#FF4D6A40",
   warning:     "#FFB020",              // Amber for warnings
+  warningDim:  "#FFB02020",
+  warningMid:  "#FFB02040",
   info:        "#4D9EFF",              // Blue for info
+  infoDim:     "#4D9EFF20",
+  infoMid:     "#4D9EFF40",
   
   // Accents
   purple:      "#A259FF",              // Purple accent
+  purpleDim:   "#A259FF20",
+  purpleMid:   "#A259FF40",
+  
+  // Legacy aliases (for backward compatibility)
+  green:       "#00C374",
+  greenDim:    "#00C37420",
+  greenMid:    "#00C37440",
+  red:         "#FF4D6A",
+  amber:       "#FFB020",
+  
   gradient:    "linear-gradient(135deg, rgb(224, 24, 91) 0%, #A259FF 100%)",
 } as const;
 
