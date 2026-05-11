@@ -355,7 +355,7 @@ export default function LandingPage() {
                 flexWrap: "wrap",
               }}
             >
-              <Link href="/auth/register" style={{ textDecoration: "none" }}>
+              <Link href="/register" style={{ textDecoration: "none" }}>
                 <button
                   style={{
                     padding: "16px 32px",

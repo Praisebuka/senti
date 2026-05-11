@@ -2,10 +2,13 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { colors } from "@/constants/colors";
 import { Mail, Lock, ArrowRight, AlertCircle, Eye, EyeOff, Loader } from "lucide-react";
+import { storageUtils } from "@/utils/localStorage";
 
 export default function LoginPage() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -21,11 +24,16 @@ export default function LoginPage() {
     // Simulate API call
     setTimeout(() => {
       if (email && password) {
-        window.location.href = "/app";
+        // Save login data to localStorage with 10-minute expiry
+        const loginData = { email, password, loginTime: new Date().toISOString() };
+        storageUtils.saveWithExpiry("loginData", loginData);
+        
+        // Redirect to dashboard
+        router.push("/dashboard");
       } else {
         setError("Please fill in all fields");
+        setIsLoading(false);
       }
-      setIsLoading(false);
     }, 1500);
   };
 
@@ -101,7 +109,7 @@ export default function LoginPage() {
         >
           {/* Navigation Back */}
           <Link
-            href="/auth"
+            href="/"
             style={{
               display: "inline-flex",
               alignItems: "center",
@@ -134,7 +142,7 @@ export default function LoginPage() {
               animation: "slideInDown 0.6s ease-out",
             }}
           >
-            <Link href="/auth" style={{ textDecoration: "none" }}>
+            <Link href="/" style={{ textDecoration: "none" }}>
               <div
                 style={{
                   fontSize: "32px",

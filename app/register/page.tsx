@@ -2,10 +2,13 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { colors } from "@/constants/colors";
 import { Mail, Lock, ArrowRight, AlertCircle, Eye, EyeOff, Loader, User } from "lucide-react";
+import { storageUtils } from "@/utils/localStorage";
 
 export default function RegisterPage() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -58,9 +61,15 @@ export default function RegisterPage() {
 
     // Simulate API call
     setTimeout(() => {
-      // In real app, create account with backend
-      window.location.href = "/app";
-      setIsLoading(false);
+      // Save registration data to localStorage with 10-minute expiry
+      const registrationData = { 
+        ...formData, 
+        registeredAt: new Date().toISOString() 
+      };
+      storageUtils.saveWithExpiry("registrationData", registrationData);
+      
+      // Redirect to dashboard
+      router.push("/dashboard");
     }, 1800);
   };
 
@@ -136,7 +145,7 @@ export default function RegisterPage() {
         >
           {/* Navigation Back */}
           <Link
-            href="/auth"
+            href="/"
             style={{
               display: "inline-flex",
               alignItems: "center",
@@ -169,7 +178,7 @@ export default function RegisterPage() {
               animation: "slideInDown 0.6s ease-out",
             }}
           >
-            <Link href="/auth" style={{ textDecoration: "none" }}>
+            <Link href="/" style={{ textDecoration: "none" }}>
               <div
                 style={{
                   fontSize: "32px",
