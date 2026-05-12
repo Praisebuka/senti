@@ -1,4 +1,4 @@
-# SENTINEL Dashboard - Refactored Next.js Project
+# Core-Connect Dashboard - Refactored Next.js Project
 
 ## Project Structure
 

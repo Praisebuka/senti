@@ -1,4 +1,4 @@
-# SENTINEL Dashboard - Quick Start Guide
+# Core-Connect Dashboard - Quick Start Guide
 
 ## ✅ Build Status
 **Build Successful!** ✓ Compiled successfully

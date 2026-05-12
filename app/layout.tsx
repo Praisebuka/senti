@@ -5,7 +5,7 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "SENTINEL - Squad Payroll Verification",
+  title: "Core-Connect - Squad Payroll Verification",
   description: "AI-powered employee payroll verification system by Squad",
 };
 

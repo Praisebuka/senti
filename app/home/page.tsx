@@ -135,7 +135,7 @@ export default function LandingPage() {
             animation: "slideInDown 0.6s ease-out",
           }}
         >
-          <Link href="/auth" style={{ textDecoration: "none" }}>
+          <Link href="/" style={{ textDecoration: "none" }}>
             <div
               style={{
                 fontSize: "24px",
@@ -712,7 +712,7 @@ export default function LandingPage() {
                 animation: "slideInUp 0.8s ease-out",
               }}
             >
-              Join companies like Squad who trust SENTINEL for enterprise credential verification.
+              Join companies like Squad who trust CORE-CONNECT for enterprise credential verification.
             </p>
 
             <Link href="/auth/register" style={{ textDecoration: "none" }}>
@@ -778,7 +778,7 @@ export default function LandingPage() {
                     marginBottom: "16px",
                   }}
                 >
-                  🛡️ SENTINEL
+                  🛡️ CORE-CONNECT
                 </div>
                 <p style={{ fontSize: "14px", color: colors.textSecondary, margin: 0, lineHeight: "1.6" }}>
                   Enterprise credential verification for the modern fintech stack.
@@ -886,7 +886,7 @@ export default function LandingPage() {
               }}
             >
               <p style={{ fontSize: "14px", color: colors.textSecondary, margin: 0 }}>
-                © 2024 SENTINEL. All rights reserved.
+                © 2026 CORE-CONNECT. All rights reserved.
               </p>
 
               <div style={{ display: "flex", gap: "20px" }}>

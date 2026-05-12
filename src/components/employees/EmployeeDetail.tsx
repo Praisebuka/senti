@@ -81,7 +81,7 @@ export function EmployeeDetail({ emp, onBack }: EmployeeDetailProps) {
                 marginBottom: 4,
               }}
             >
-              SENTINEL TRUST SCORE
+              Core-Connect TRUST SCORE
             </div>
             <div
               style={{
@@ -172,7 +172,7 @@ export function EmployeeDetail({ emp, onBack }: EmployeeDetailProps) {
             <br />
             amount: {emp.salary * 100} (kobo)
             <br />
-            ref: SENTINEL-{emp.verdict}|{emp.sts}|{emp.id}
+            ref: Core-Connect-{emp.verdict}|{emp.sts}|{emp.id}
             <br />
             status:{" "}
             <span
@@ -332,11 +332,7 @@ export function EmployeeDetail({ emp, onBack }: EmployeeDetailProps) {
             gap: 8,
           }}
         >
-          {running
-            ? "Running SENTINEL AI…"
-            : ran
-              ? "✓ Verification Complete — Rerun"
-              : "Run Full Verification"}
+          {running ? "Running Core-Connect AI…" : ran ? "✓ Verification Complete — Rerun" : "Run Full Verification"}
         </button>
         {running && (
           <div

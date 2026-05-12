@@ -101,7 +101,7 @@ export default function RegisterPage() {
         // Redirect to dashboard
         router.push("/dashboard");
         resolve(null);
-      }, 800);
+      }, 400);
     });
   };
 
@@ -231,7 +231,7 @@ export default function RegisterPage() {
                   (e.target as any).style.transform = "scale(1)";
                 }}
               >
-                🛡️ SENTINEL
+                🛡️ CORE-CONNECT
               </div>
             </Link>
             <h1
@@ -251,7 +251,7 @@ export default function RegisterPage() {
                 margin: 0,
               }}
             >
-              Join thousands of companies using SENTINEL
+              Join thousands of companies using CORE-CONNECT
             </p>
           </div>
 
@@ -719,7 +719,7 @@ export default function RegisterPage() {
             }}
           >
             <p style={{ margin: 0, lineHeight: "1.6" }}>
-              By creating an account, you'll get instant access to SENTINEL's powerful verification tools
+              By creating an account, you'll get instant access to CORE-CONNECT's powerful verification tools
             </p>
           </div>
         </div>

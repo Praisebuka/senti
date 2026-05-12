@@ -64,7 +64,7 @@ export default function LoginPage() {
         // Redirect to dashboard
         router.push("/dashboard");
         resolve(null);
-      }, 800);
+      }, 400);
     });
   };
 
@@ -194,7 +194,7 @@ export default function LoginPage() {
                   (e.target as any).style.transform = "scale(1)";
                 }}
               >
-                🛡️ SENTINEL
+                🛡️ CORE-CONNECT
               </div>
             </Link>
             <h1
