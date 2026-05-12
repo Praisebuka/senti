@@ -15,9 +15,21 @@ import {
   Github,
   Twitter,
   Linkedin,
+  Mail,
+  Send,
 } from "lucide-react";
 
 export default function LandingPage() {
+  const [newsletter, setNewsletter] = useState("");
+  const [newsSubmitted, setNewsSubmitted] = useState(false);
+  const [isMobile, setIsMobile] = React.useState(false);
+
+  React.useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
   const [hoveredFeature, setHoveredFeature] = useState<number | null>(null);
 
   const features = [
@@ -78,6 +90,26 @@ export default function LandingPage() {
 
   return (
     <div style={{ background: colors.bg, color: colors.text, overflow: "hidden" }}>
+      {/* Responsive Styles */}
+      <style>{`
+        @media (max-width: 768px) {
+          * { box-sizing: border-box; }
+        }
+        @media (max-width: 480px) {
+          h1 { font-size: 36px !important; line-height: 1.3 !important; }
+          h2 { font-size: 28px !important; }
+          p { font-size: 14px !important; }
+        }
+        @media (max-width: 768px) {
+          [data-section="padding"] { padding: 40px 24px !important; }
+          [data-hero] { padding: 40px 24px 60px !important; min-height: auto !important; }
+          [data-nav-links] { display: none !important; }
+          [data-mobile-nav] { display: flex !important; }
+          [data-features-grid] { grid-template-columns: 1fr !important; }
+          [data-cta-buttons] { flex-direction: column; }
+          [data-cta-buttons] button { width: 100%; }
+        }
+      `}</style>
       {/* Animated Background Elements */}
       <div
         style={{
@@ -125,7 +157,7 @@ export default function LandingPage() {
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            padding: "24px 48px",
+            padding: isMobile ? "16px 24px" : "24px 48px",
             borderBottom: `1px solid ${colors.border}`,
             backdropFilter: "blur(10px)",
             backgroundColor: "rgba(10, 14, 39, 0.7)",
@@ -133,12 +165,13 @@ export default function LandingPage() {
             top: 0,
             zIndex: 100,
             animation: "slideInDown 0.6s ease-out",
+            gap: isMobile ? "12px" : "32px",
           }}
         >
-          <Link href="/" style={{ textDecoration: "none" }}>
+          <Link href="/" style={{ textDecoration: "none", display: "flex", alignItems: "center" }}>
             <div
               style={{
-                fontSize: "24px",
+                fontSize: isMobile ? "16px" : "24px",
                 fontWeight: "800",
                 background: colors.gradient,
                 backgroundClip: "text",
@@ -147,19 +180,30 @@ export default function LandingPage() {
                 letterSpacing: "-0.5px",
                 cursor: "pointer",
                 transition: "transform 0.3s ease",
+                whiteSpace: "nowrap",
               }}
               onMouseEnter={(e) => {
-                (e.target as any).style.transform = "scale(1.05)";
+                if (!isMobile) (e.target as any).style.transform = "scale(1.05)";
               }}
               onMouseLeave={(e) => {
-                (e.target as any).style.transform = "scale(1)";
+                if (!isMobile) (e.target as any).style.transform = "scale(1)";
               }}
             >
-              🛡️ CORE CONNECT
+              🛡️ {!isMobile && "CORE CONNECT"}
             </div>
           </Link>
 
-          <div style={{ display: "flex", gap: "32px", alignItems: "center" }}>
+          {/* Desktop Navigation */}
+          <div
+            data-nav-links
+            style={{
+              display: !isMobile ? "flex" : "none",
+              gap: "32px",
+              alignItems: "center",
+              flex: 1,
+              justifyContent: "center",
+            }}
+          >
             <a
               href="#features"
               style={{
@@ -233,8 +277,11 @@ export default function LandingPage() {
             >
               Contact
             </Link>
+          </div>
 
-            <Link href="/login" style={{ textDecoration: "none" }}>
+          {/* Desktop Login Button */}
+          {!isMobile && (
+            <Link href="/login" style={{ textDecoration: "none", marginLeft: "auto" }}>
               <button
                 style={{
                   padding: "10px 24px",
@@ -264,18 +311,40 @@ export default function LandingPage() {
                 <ArrowRight size={16} />
               </button>
             </Link>
-          </div>
+          )}
+
+          {/* Mobile Menu Button */}
+          {isMobile && (
+            <Link href="/login" style={{ textDecoration: "none" }}>
+              <button
+                style={{
+                  padding: "8px 16px",
+                  background: colors.primary,
+                  color: "white",
+                  border: "none",
+                  borderRadius: "6px",
+                  fontSize: "12px",
+                  fontWeight: "600",
+                  cursor: "pointer",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                Login
+              </button>
+            </Link>
+          )}
         </nav>
 
         {/* Hero Section */}
         <section
+          data-hero
           style={{
             minHeight: "100vh",
             display: "flex",
             flexDirection: "column",
             justifyContent: "center",
             alignItems: "center",
-            padding: "80px 48px",
+            padding: isMobile ? "40px 24px 60px" : "80px 48px",
             textAlign: "center",
             position: "relative",
             overflow: "hidden",
@@ -329,7 +398,7 @@ export default function LandingPage() {
             {/* Main Headline */}
             <h1
               style={{
-                fontSize: "72px",
+                fontSize: isMobile ? "36px" : "72px",
                 fontWeight: "800",
                 lineHeight: "1.2",
                 margin: "24px 0",
@@ -347,7 +416,7 @@ export default function LandingPage() {
             {/* Subheading */}
             <p
               style={{
-                fontSize: "18px",
+                fontSize: isMobile ? "14px" : "18px",
                 color: colors.textSecondary,
                 lineHeight: "1.6",
                 margin: "24px 0",
@@ -362,6 +431,7 @@ export default function LandingPage() {
 
             {/* CTA Buttons */}
             <div
+              data-cta-buttons
               style={{
                 display: "flex",
                 gap: "16px",
@@ -435,8 +505,8 @@ export default function LandingPage() {
             <div
               style={{
                 display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-                gap: "40px",
+                gridTemplateColumns: isMobile ? "repeat(2, 1fr)" : "repeat(auto-fit, minmax(200px, 1fr))",
+                gap: isMobile ? "20px" : "40px",
                 margin: "80px 0",
                 animation: "slideInUp 1.4s ease-out",
               }}
@@ -474,18 +544,19 @@ export default function LandingPage() {
         {/* Features Section */}
         <section
           id="features"
+          data-section="padding"
           style={{
-            padding: "100px 48px",
+            padding: isMobile ? "40px 24px" : "100px 48px",
             background: `linear-gradient(180deg, transparent 0%, rgba(224, 24, 91, 0.03) 100%)`,
             borderTop: `1px solid ${colors.border}`,
             borderBottom: `1px solid ${colors.border}`,
           }}
         >
           <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
-            <div style={{ textAlign: "center", marginBottom: "80px" }}>
+            <div style={{ textAlign: "center", marginBottom: isMobile ? "40px" : "80px" }}>
               <h2
                 style={{
-                  fontSize: "48px",
+                  fontSize: isMobile ? "28px" : "48px",
                   fontWeight: "800",
                   margin: "0 0 16px 0",
                   animation: "slideInUp 0.6s ease-out",
@@ -495,7 +566,7 @@ export default function LandingPage() {
               </h2>
               <p
                 style={{
-                  fontSize: "18px",
+                  fontSize: isMobile ? "14px" : "18px",
                   color: colors.textSecondary,
                   margin: 0,
                   animation: "slideInUp 0.8s ease-out",
@@ -507,9 +578,10 @@ export default function LandingPage() {
 
             {/* Features Grid */}
             <div
+              data-features-grid
               style={{
                 display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+                gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fit, minmax(280px, 1fr))",
                 gap: "24px",
               }}
             >
@@ -629,7 +701,7 @@ export default function LandingPage() {
               </p>
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "32px" }}>
+            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fit, minmax(300px, 1fr))", gap: "32px" }}>
               {useCases.map((useCase, idx) => {
                 const Icon = useCase.icon;
                 return (
@@ -749,10 +821,220 @@ export default function LandingPage() {
           </div>
         </section>
 
+        {/* Contact Preview Section */}
+        <section
+          data-section="padding"
+          style={{
+            padding: isMobile ? "40px 24px" : "100px 48px",
+            background: `linear-gradient(135deg, ${colors.primary}08, ${colors.purple}08)`,
+            borderTop: `1px solid ${colors.border}`,
+            borderBottom: `1px solid ${colors.border}`,
+          }}
+        >
+          <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
+            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: isMobile ? "32px" : "60px", alignItems: "center" }}>
+              {/* Contact Info */}
+              <div>
+                <h2
+                  style={{
+                    fontSize: isMobile ? "28px" : "48px",
+                    fontWeight: "800",
+                    marginBottom: "24px",
+                    margin: "0 0 24px 0",
+                  }}
+                >
+                  Get in Touch
+                </h2>
+                <p
+                  style={{
+                    fontSize: isMobile ? "14px" : "16px",
+                    color: colors.textSecondary,
+                    lineHeight: "1.8",
+                    marginBottom: "32px",
+                    margin: "0 0 32px 0",
+                  }}
+                >
+                  Have questions about Core Connect? Our team is here to help. Reach out to us and we'll respond within 24 hours.
+                </p>
+
+                <div style={{ display: "flex", flexDirection: "column", gap: "16px", marginBottom: "32px" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                    <Mail size={20} color={colors.primary} />
+                    <div>
+                      <div style={{ fontSize: "12px", color: colors.textSecondary, fontWeight: "500" }}>Email</div>
+                      <div style={{ fontSize: "14px", fontWeight: "600" }}>contact@core-connect.com</div>
+                    </div>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                    <Zap size={20} color={colors.primary} />
+                    <div>
+                      <div style={{ fontSize: "12px", color: colors.textSecondary, fontWeight: "500" }}>Response Time</div>
+                      <div style={{ fontSize: "14px", fontWeight: "600" }}>Under 24 hours</div>
+                    </div>
+                  </div>
+                </div>
+
+                <Link href="/contact">
+                  <button
+                    style={{
+                      padding: "12px 28px",
+                      background: colors.gradient,
+                      color: "white",
+                      border: "none",
+                      borderRadius: "8px",
+                      fontSize: "14px",
+                      fontWeight: "600",
+                      cursor: "pointer",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "8px",
+                      transition: "all 0.2s ease",
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!isMobile) {
+                        e.currentTarget.style.transform = "translateY(-2px)";
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!isMobile) {
+                        e.currentTarget.style.transform = "translateY(0)";
+                      }
+                    }}
+                  >
+                    Contact Us
+                    <ArrowRight size={16} />
+                  </button>
+                </Link>
+              </div>
+
+              {/* Newsletter */}
+              <div
+                style={{
+                  padding: "40px",
+                  background: colors.surface,
+                  borderRadius: "16px",
+                  border: `1px solid ${colors.border}`,
+                }}
+              >
+                <h3
+                  style={{
+                    fontSize: isMobile ? "20px" : "24px",
+                    fontWeight: "700",
+                    marginBottom: "12px",
+                    margin: "0 0 12px 0",
+                  }}
+                >
+                  Stay Updated
+                </h3>
+                <p
+                  style={{
+                    fontSize: "14px",
+                    color: colors.textSecondary,
+                    marginBottom: "24px",
+                    margin: "0 0 24px 0",
+                  }}
+                >
+                  Subscribe to our newsletter for the latest updates, tips, and industry insights on employee verification.
+                </p>
+
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    if (newsletter.trim()) {
+                      setNewsSubmitted(true);
+                      setNewsletter("");
+                      setTimeout(() => setNewsSubmitted(false), 3000);
+                    }
+                  }}
+                  style={{ display: "flex", flexDirection: "column", gap: "12px" }}
+                >
+                  <input
+                    type="email"
+                    placeholder="Enter your email"
+                    value={newsletter}
+                    onChange={(e) => setNewsletter(e.target.value)}
+                    required
+                    style={{
+                      padding: "12px 16px",
+                      background: colors.bg,
+                      border: `1px solid ${colors.border}`,
+                      borderRadius: "8px",
+                      color: colors.text,
+                      fontSize: "14px",
+                      outline: "none",
+                      transition: "all 0.2s ease",
+                      boxSizing: "border-box",
+                    }}
+                    onFocus={(e) => {
+                      e.currentTarget.style.borderColor = colors.primary;
+                      e.currentTarget.style.boxShadow = `0 0 0 3px ${colors.primary}20`;
+                    }}
+                    onBlur={(e) => {
+                      e.currentTarget.style.borderColor = colors.border;
+                      e.currentTarget.style.boxShadow = "none";
+                    }}
+                  />
+                  <button
+                    type="submit"
+                    style={{
+                      padding: "12px 16px",
+                      background: newsSubmitted ? colors.success : colors.primary,
+                      color: "white",
+                      border: "none",
+                      borderRadius: "8px",
+                      fontSize: "14px",
+                      fontWeight: "600",
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: "8px",
+                      transition: "all 0.2s ease",
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!isMobile && !newsSubmitted) {
+                        e.currentTarget.style.transform = "translateY(-2px)";
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!isMobile && !newsSubmitted) {
+                        e.currentTarget.style.transform = "translateY(0)";
+                      }
+                    }}
+                  >
+                    {newsSubmitted ? (
+                      <>
+                        <CheckCircle size={16} />
+                        Subscribed!
+                      </>
+                    ) : (
+                      <>
+                        <Send size={16} />
+                        Subscribe
+                      </>
+                    )}
+                  </button>
+                </form>
+
+                <p
+                  style={{
+                    fontSize: "12px",
+                    color: colors.textSecondary,
+                    marginTop: "16px",
+                    margin: "16px 0 0 0",
+                  }}
+                >
+                  We respect your privacy. Unsubscribe anytime.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Footer */}
         <footer
           style={{
-            padding: "60px 48px",
+            padding: isMobile ? "40px 24px" : "60px 48px",
             borderTop: `1px solid ${colors.border}`,
             background: `rgba(10, 14, 39, 0.5)`,
           }}
@@ -761,7 +1043,7 @@ export default function LandingPage() {
             <div
               style={{
                 display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+                gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fit, minmax(240px, 1fr))",
                 gap: "40px",
                 marginBottom: "40px",
               }}
