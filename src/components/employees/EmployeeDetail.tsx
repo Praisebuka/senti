@@ -1,17 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   AlertTriangle,
   Activity,
   FileText,
   Network,
+  CheckCircle,
+  XCircle,
+  Loader,
 } from "lucide-react";
 import { colors } from "@/constants/colors";
 import { Card, ScoreRing } from "@/components/shared";
 import { Employee } from "@/types";
 import { verdictColor, squadAction, getComponentColor } from "@/utils/helpers";
 import { getVerdictIcon } from "@/utils/icons";
+import { verifyBVN, BVNVerificationResult } from "@/utils/squadAPI";
 
 interface EmployeeDetailProps {
   emp: Employee;
@@ -21,6 +25,28 @@ interface EmployeeDetailProps {
 export function EmployeeDetail({ emp, onBack }: EmployeeDetailProps) {
   const [running, setRunning] = useState(false);
   const [ran, setRan] = useState(false);
+  const [bvnVerifying, setBvnVerifying] = useState(false);
+  const [bvnResult, setBvnResult] = useState<BVNVerificationResult | null>(null);
+  const [bvnVerified, setBvnVerified] = useState(false);
+
+  useEffect(() => {
+    // Auto-verify BVN when component loads
+    runBVNVerification();
+  }, [emp.bvn]);
+
+  const runBVNVerification = async () => {
+    setBvnVerifying(true);
+    try {
+      const result = await verifyBVN(emp.bvn, emp.name);
+      setBvnResult(result);
+      setBvnVerified(result.status === "success");
+    } catch (error) {
+      console.error("BVN verification error:", error);
+      setBvnVerified(false);
+    } finally {
+      setBvnVerifying(false);
+    }
+  };
 
   const simulate = () => {
     setRunning(true);
@@ -53,6 +79,12 @@ export function EmployeeDetail({ emp, onBack }: EmployeeDetailProps) {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+      <style>{`
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
       <button
         onClick={onBack}
         style={{
@@ -189,6 +221,112 @@ export function EmployeeDetail({ emp, onBack }: EmployeeDetailProps) {
           </div>
         </Card>
       </div>
+
+      <Card>
+        <div
+          style={{
+            color: colors.muted,
+            fontSize: 11,
+            marginBottom: 12,
+            display: "flex",
+            alignItems: "center",
+            gap: 6,
+            justifyContent: "space-between",
+          }}
+        >
+          <span>SQUAD BVN VERIFICATION</span>
+          {bvnVerifying && <Loader size={12} style={{ animation: "spin 1s linear infinite" }} />}
+        </div>
+
+        {bvnResult && (
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: 12,
+              marginBottom: 12,
+            }}
+          >
+            <div>
+              <div style={{ color: colors.muted, fontSize: 10, marginBottom: 4 }}>
+                Verification Status
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 6,
+                  color: bvnVerified ? colors.success : colors.error,
+                  fontWeight: 600,
+                  fontSize: 13,
+                }}
+              >
+                {bvnVerified ? <CheckCircle size={14} /> : <XCircle size={14} />}
+                {bvnVerified ? "Verified" : "Failed"}
+              </div>
+            </div>
+            <div>
+              <div style={{ color: colors.muted, fontSize: 10, marginBottom: 4 }}>
+                Confidence Score
+              </div>
+              <div style={{ color: colors.text, fontWeight: 600, fontSize: 13 }}>
+                {bvnResult.confidence_score.toFixed(1)}%
+              </div>
+            </div>
+            <div>
+              <div style={{ color: colors.muted, fontSize: 10, marginBottom: 4 }}>
+                Verified Name
+              </div>
+              <div style={{ color: colors.text, fontSize: 12 }}>
+                {bvnResult.data?.verified_name || "N/A"}
+              </div>
+            </div>
+            <div>
+              <div style={{ color: colors.muted, fontSize: 10, marginBottom: 4 }}>
+                Date of Birth
+              </div>
+              <div style={{ color: colors.text, fontSize: 12 }}>
+                {bvnResult.data?.date_of_birth || "N/A"}
+              </div>
+            </div>
+            <div>
+              <div style={{ color: colors.muted, fontSize: 10, marginBottom: 4 }}>
+                Gender
+              </div>
+              <div style={{ color: colors.text, fontSize: 12 }}>
+                {bvnResult.data?.gender || "N/A"}
+              </div>
+            </div>
+            <div>
+              <div style={{ color: colors.muted, fontSize: 10, marginBottom: 4 }}>
+                Marital Status
+              </div>
+              <div style={{ color: colors.text, fontSize: 12 }}>
+                {bvnResult.data?.marital_status || "N/A"}
+              </div>
+            </div>
+          </div>
+        )}
+
+        <button
+          onClick={runBVNVerification}
+          disabled={bvnVerifying}
+          style={{
+            background: colors.info,
+            color: "#fff",
+            fontWeight: 600,
+            fontSize: 12,
+            padding: "8px 16px",
+            borderRadius: 6,
+            border: "none",
+            cursor: bvnVerifying ? "not-allowed" : "pointer",
+            opacity: bvnVerifying ? 0.7 : 1,
+            width: "100%",
+          }}
+        >
+          {bvnVerifying ? "Verifying BVN with Squad..." : "Re-verify BVN"}
+        </button>
+      </Card>
 
       <Card>
         <div
