@@ -17,6 +17,30 @@ export interface Employee {
   verificationStatus?: "pending" | "verified" | "flagged" | "blocked";
 }
 
+export interface BVNVerificationResult {
+  status: "verified" | "mismatch" | "error";
+  verified_name?: string;
+  confidence: number; // 0-100
+  issues: string[];
+  data?: {
+    bvn: string;
+    verified_name: string;
+    date_of_birth?: string;
+  };
+}
+
+export interface SanctionsCheckResult {
+  status: "success" | "error";
+  is_sanctioned: boolean;
+  lists: string[]; // Which lists (OFAC, UN, etc.)
+  match_confidence: number; // 0-100
+  details: string;
+  data?: {
+    matched_names: string[];
+    list_sources: string[];
+  };
+}
+
 export interface ComprehensiveVerification {
   identityScore: number;
   financialScore: number;
@@ -27,11 +51,12 @@ export interface ComprehensiveVerification {
   riskLevel: "low" | "medium" | "high" | "critical";
   recommendation: string;
   verifications: {
-    bvn?: any;
+    bvn?: BVNVerificationResult | null;
     payroll?: any;
     settlement?: any;
     transaction?: any;
     duplicates?: any;
+    sanctions?: SanctionsCheckResult | null;
   };
 }
 

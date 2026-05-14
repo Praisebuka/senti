@@ -195,9 +195,33 @@ export function CredentialVerifier() {
             color: colors.muted,
             fontSize: 13,
             marginBottom: 14,
+            cursor: "pointer",
+            transition: "all 0.2s",
           }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.borderColor = colors.primary;
+            e.currentTarget.style.background = `${colors.primary}08`;
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.borderColor = colors.border;
+            e.currentTarget.style.background = "transparent";
+          }}
+          onClick={() => document.getElementById("fileInput")?.click()}
         >
-          📎 Drop certificate image / PDF here (v0.1 — OCR simulation active)
+          📎 Click or drop certificate image / PDF here (v0.1 — OCR simulation active)
+          <input
+            id="fileInput"
+            type="file"
+            accept=".pdf,.jpg,.jpeg,.png"
+            style={{ display: "none" }}
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) {
+                console.log("File selected:", file.name);
+                // In a real app, this would hash and verify the file
+              }
+            }}
+          />
         </div>
 
         <button

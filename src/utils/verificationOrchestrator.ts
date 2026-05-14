@@ -30,12 +30,14 @@ export async function runComprehensiveVerification(
   const timestamp = new Date().toISOString();
 
   try {
-    // Create verification profile (bank + documents)
+    // Create verification profile (bank + documents + BVN + sanctions)
     const profile = await createEmployeeVerificationProfile(
       employee.id,
       employee.account,
       employee.bank,
-      documentHash
+      documentHash,
+      employee.name,
+      employee.bvn
     );
 
     // Convert profile to summary format
@@ -59,15 +61,17 @@ export async function runComprehensiveVerification(
 function convertProfileToSummary(profile: EmployeeVerificationProfile): ComprehensiveVerification {
   const bankVerified = profile.components.bank_account_verification?.success || false;
   const docVerified = profile.components.document_verification?.status === "verified";
+  const bvnVerified = profile.components.bvn_verification?.status === "verified";
+  const isSanctioned = profile.components.sanctions_check?.is_sanctioned || false;
 
-  // Score breakdown
-  const identityScore = docVerified ? 85 : bankVerified ? 60 : 30;
-  const financialScore = bankVerified ? 75 : 40;
-  const behavioralScore = 70; // Would require transaction data
-  const networkScore = 80; // Would require duplicate detection service
-  const temporalScore = 70; // Would require historical analysis
+  // Score breakdown with real data
+  const identityScore = isSanctioned ? 0 : docVerified ? 85 : bvnVerified ? 80 : bankVerified ? 60 : 30;
+  const financialScore = isSanctioned ? 0 : bankVerified ? 75 : 40;
+  const behavioralScore = isSanctioned ? 5 : 70; // Would require transaction data
+  const networkScore = isSanctioned ? 5 : 80; // Would require duplicate detection service
+  const temporalScore = isSanctioned ? 5 : 70; // Would require historical analysis
 
-  const overallRiskScore = 100 - profile.verification_score;
+  const overallRiskScore = isSanctioned ? 95 : 100 - profile.verification_score;
 
   const recommendation = generateRecommendation(profile);
 
@@ -81,11 +85,12 @@ function convertProfileToSummary(profile: EmployeeVerificationProfile): Comprehe
     riskLevel: getRiskLevel(overallRiskScore),
     recommendation,
     verifications: {
-      bvn: null, // Not available from Squad
+      bvn: profile.components.bvn_verification || null,
       payroll: null,
       settlement: profile.components.bank_account_verification,
       transaction: null,
       duplicates: null,
+      sanctions: profile.components.sanctions_check || null,
     },
   };
 }
