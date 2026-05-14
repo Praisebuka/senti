@@ -1,4 +1,4 @@
-const SQUAD_API_KEY = process.env.NEXT_PUBLIC_SQUAD_API_KEY || "sk_test_demo_key";
+const SQUAD_API_KEY = process.env.NEXT_PUBLIC_SQUAD_API_KEY || "sandbox_pk_9070bac8e4ef5eba7e93a5b9f7ca0581402b8177c110";
 const SQUAD_BASE_URL = "https://api.squadco.com/v1";
 
 export interface BVNVerificationResult {
@@ -118,6 +118,7 @@ export async function verifyBVN(
       }),
     });
 
+    console.log("verifying bvn: " + response);
     if (!response.ok) {
       throw new Error(`BVN verification failed: ${response.statusText}`);
     }
