@@ -17,6 +17,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
+        <style>{`
+          .swal2-popup {
+            font-size: 10px !important;
+          }
+        `}</style>
         {children}
       </body>
     </html>

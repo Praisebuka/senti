@@ -32,9 +32,14 @@ export default function LoginPage() {
     if (!email || !password) {
       setError("Please fill in all fields");
       setIsLoading(false);
-      await alert.showError({
+      // await alert.showError({
+      //   title: "Missing Fields",
+      //   message: "Please enter both email and password",
+      // });
+      Swal.fire({
+        icon: "error",
         title: "Missing Fields",
-        message: "Please enter both email and password",
+        text: `Please enter both email and password`,
       });
       return;
     }
@@ -56,15 +61,21 @@ export default function LoginPage() {
         storageUtils.saveWithExpiry("loginData", loginData);
 
         // Show success alert and redirect
-        await alert.showSuccess({
+        // await alert.showSuccess({
+        //   title: "Login Successful!",
+        //   message: `Welcome back! You're being redirected to your dashboard.`,
+        // });
+        Swal.fire({
+          icon: "success",
           title: "Login Successful!",
-          message: `Welcome back! You're being redirected to your dashboard.`,
+          text: `Welcome back! You're being redirected to your dashboard.`,
         });
 
         // Redirect to dashboard
         router.push("/dashboard");
         resolve(null);
-      }, 400);
+        // redirect("/dashboard");
+      }, 300);
     });
   };
 
