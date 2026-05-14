@@ -8,18 +8,13 @@ import { storageUtils } from "@/utils/localStorage";
 export default function DashboardPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
-  const [userData, setUserData] = useState<any>(null);
 
   useEffect(() => {
     // Check if user is logged in via localStorage
     const loginData = storageUtils.getWithExpiry("loginData");
     const registrationData = storageUtils.getWithExpiry("registrationData");
 
-    if (loginData) {
-      setUserData(loginData);
-      setIsLoading(false);
-    } else if (registrationData) {
-      setUserData(registrationData);
+    if (loginData || registrationData) {
       setIsLoading(false);
     } else {
       // No valid session, redirect to login

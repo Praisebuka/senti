@@ -21,12 +21,12 @@ export const EmployeeList: React.FC<EmployeeListProps> = ({ onSelect }) => {
   );
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-      <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 16, width: "100%" }}>
+      <div style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "flex-start" }}>
         <div
           style={{
             flex: 1,
-            minWidth: 200,
+            minWidth: "200px",
             display: "flex",
             alignItems: "center",
             gap: 8,
@@ -73,8 +73,8 @@ export const EmployeeList: React.FC<EmployeeListProps> = ({ onSelect }) => {
         ))}
       </div>
 
-      <Card style={{ padding: 0, overflow: "hidden" }}>
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+      <Card style={{ padding: 0, overflow: "auto", minWidth: 0 }}>
+        <table style={{ width: "100%", borderCollapse: "collapse", minWidth: "600px" }}>
           <thead>
             <tr style={{ borderBottom: `1px solid ${colors.border}` }}>
               {["Employee", "Dept", "Salary", "STS", "Verdict", "Squad Action", ""].map(

@@ -14,6 +14,8 @@ import {
   HelpCircle,
   BarChart3,
   CheckSquare,
+  Menu,
+  X,
 } from "lucide-react";
 import { colors } from "@/constants/colors";
 import { Dashboard } from "@/components/dashboard/Dashboard";
@@ -49,6 +51,7 @@ export function AppShell({}: AppShellProps) {
   const alert = useAlert();
   const [view, setView] = useState("dashboard");
   const [selected, setSelected] = useState<Employee | null>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Initialize alert styles on mount
   useEffect(() => {
@@ -100,12 +103,90 @@ export function AppShell({}: AppShellProps) {
         color: colors.text,
         fontFamily: "'Inter',system-ui,sans-serif",
         overflow: "hidden",
+        flexDirection: "column",
       }}
     >
+      <style>{`
+        @media (min-width: 751px) {
+          #app-main-container {
+            flex-direction: row !important;
+          }
+          #sidebar {
+            width: 220px !important;
+            position: relative !important;
+            transform: none !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+            display: flex !important;
+          }
+          #hamburger-btn {
+            display: none !important;
+          }
+          #overlay {
+            display: none !important;
+          }
+        }
+
+        @media (max-width: 750px) {
+          #sidebar {
+            position: fixed;
+            left: 0;
+            top: 60px;
+            width: 260px;
+            height: calc(100vh - 60px);
+            z-index: 1000;
+            transform: translateX(-100%);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            display: flex;
+          }
+          
+          #sidebar.mobile-open {
+            transform: translateX(0);
+            opacity: 1;
+            visibility: visible;
+          }
+
+          #overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 999;
+          }
+
+          #overlay.mobile-open {
+            opacity: 1;
+            visibility: visible;
+          }
+
+          #app-main-container {
+            flex-direction: column !important;
+          }
+        }
+
+        @media (max-width: 300px) {
+          #sidebar {
+            width: 100% !important;
+          }
+        }
+      `}</style>
+
+      {/* Mobile Overlay */}
+      <div
+        id="overlay"
+        className={mobileMenuOpen ? "mobile-open" : ""}
+        onClick={() => setMobileMenuOpen(false)}
+        style={{ cursor: "pointer" }}
+      />
+
       {/* Sidebar */}
       <div
+        id="sidebar"
         style={{
-          width: 220,
           background: colors.surface,
           borderRight: `1px solid ${colors.border}`,
           display: "flex",
@@ -336,88 +417,119 @@ export function AppShell({}: AppShellProps) {
 
       {/* Main */}
       <div
+        id="app-main-container"
         style={{
           flex: 1,
           display: "flex",
-          flexDirection: "column",
+          flexDirection: "row",
           overflow: "hidden",
         }}
       >
-        {/* Topbar */}
-        <div
-          style={{
-            background: colors.surface,
-            borderBottom: `1px solid ${colors.border}`,
-            padding: "14px 24px",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            flexShrink: 0,
-          }}
-        >
-          <div>
-            <div
-              style={{
-                color: colors.text,
-                fontWeight: 700,
-                fontSize: 16,
-              }}
-            >
-              {pageTitle}
-            </div>
-            <div
-              style={{
-                color: colors.muted,
-                fontSize: 11,
-                marginTop: 2,
-              }}
-            >
-              Osun State Government · MDA Pilot
-            </div>
-          </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <div style={{ position: "relative", cursor: "pointer" }}>
-              <Bell size={18} color={colors.muted} />
-              <div
-                style={{
-                  position: "absolute",
-                  top: -3,
-                  right: -3,
-                  width: 8,
-                  height: 8,
-                  borderRadius: "50%",
-                  background: colors.error,
-                }}
-              />
-            </div>
-            <div
-              style={{
-                width: 32,
-                height: 32,
-                borderRadius: "50%",
-                background: `rgba(224, 24, 91, 0.2)`,
-                border: `1px solid ${colors.primary}`,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: colors.primary,
-                fontSize: 12,
-                fontWeight: 700,
-              }}
-            >
-              A
-            </div>
-          </div>
-        </div>
-
-        {/* Content */}
+        {/* Right Panel - Content Area */}
         <div
           style={{
             flex: 1,
-            overflowY: "auto",
-            padding: 24,
+            display: "flex",
+            flexDirection: "column",
+            overflow: "hidden",
+            minWidth: 0,
           }}
         >
+          {/* Topbar */}
+          <div
+            style={{
+              background: colors.surface,
+              borderBottom: `1px solid ${colors.border}`,
+              padding: "14px 24px",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              flexShrink: 0,
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+              <button
+                id="hamburger-btn"
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                style={{
+                  background: "none",
+                  border: "none",
+                  color: colors.primary,
+                  cursor: "pointer",
+                  padding: 0,
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+              </button>
+              <div>
+                <div
+                  style={{
+                    color: colors.text,
+                    fontWeight: 700,
+                    fontSize: 16,
+                  }}
+                >
+                  {pageTitle}
+                </div>
+                <div
+                  style={{
+                    color: colors.muted,
+                    fontSize: 11,
+                    marginTop: 2,
+                  }}
+                >
+                  Osun State Government · MDA Pilot
+                </div>
+              </div>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              <div style={{ position: "relative", cursor: "pointer" }}>
+                <Bell size={18} color={colors.muted} />
+                <div
+                  style={{
+                    position: "absolute",
+                    top: -3,
+                    right: -3,
+                    width: 8,
+                    height: 8,
+                    borderRadius: "50%",
+                    background: colors.error,
+                  }}
+                />
+              </div>
+              <div
+                style={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: "50%",
+                  background: `rgba(224, 24, 91, 0.2)`,
+                  border: `1px solid ${colors.primary}`,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: colors.primary,
+                  fontSize: 12,
+                  fontWeight: 700,
+                }}
+              >
+                A
+              </div>
+            </div>
+          </div>
+
+          {/* Content */}
+          <div
+            style={{
+              flex: 1,
+              overflowY: "auto",
+              padding: "24px",
+              display: "flex",
+              flexDirection: "column",
+              minWidth: 0,
+            }}
+          >
           {view === "dashboard" && <Dashboard />}
           {view === "employees" && (
             <EmployeeList onSelect={handleSelectEmployee} />

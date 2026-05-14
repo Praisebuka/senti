@@ -9,6 +9,7 @@ import {
   CheckCircle,
   XCircle,
   Loader,
+  Zap,
 } from "lucide-react";
 import { colors } from "@/constants/colors";
 import { Card, ScoreRing } from "@/components/shared";
@@ -16,6 +17,8 @@ import { Employee } from "@/types";
 import { verdictColor, squadAction, getComponentColor } from "@/utils/helpers";
 import { getVerdictIcon } from "@/utils/icons";
 import { verifyBVN, BVNVerificationResult } from "@/utils/squadAPI";
+import { AdvancedVerification } from "@/components/employees/AdvancedVerification";
+import { runComprehensiveVerification, VerificationReport } from "@/utils/verificationOrchestrator";
 
 interface EmployeeDetailProps {
   emp: Employee;
@@ -23,11 +26,14 @@ interface EmployeeDetailProps {
 }
 
 export function EmployeeDetail({ emp, onBack }: EmployeeDetailProps) {
+  const [tab, setTab] = useState<"overview" | "advanced">("overview");
   const [running, setRunning] = useState(false);
   const [ran, setRan] = useState(false);
   const [bvnVerifying, setBvnVerifying] = useState(false);
   const [bvnResult, setBvnResult] = useState<BVNVerificationResult | null>(null);
   const [bvnVerified, setBvnVerified] = useState(false);
+  const [comprehensiveLoading, setComprehensiveLoading] = useState(false);
+  const [comprehensiveReport, setComprehensiveReport] = useState<VerificationReport | null>(null);
 
   useEffect(() => {
     // Auto-verify BVN when component loads
@@ -45,6 +51,18 @@ export function EmployeeDetail({ emp, onBack }: EmployeeDetailProps) {
       setBvnVerified(false);
     } finally {
       setBvnVerifying(false);
+    }
+  };
+
+  const runComprehensive = async () => {
+    setComprehensiveLoading(true);
+    try {
+      const report = await runComprehensiveVerification(emp);
+      setComprehensiveReport(report);
+    } catch (error) {
+      console.error("Comprehensive verification error:", error);
+    } finally {
+      setComprehensiveLoading(false);
     }
   };
 
@@ -102,7 +120,48 @@ export function EmployeeDetail({ emp, onBack }: EmployeeDetailProps) {
         ← Back to employees
       </button>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+      {/* Tab Navigation */}
+      <div style={{ display: "flex", gap: 12, borderBottom: `1px solid ${colors.border}`, paddingBottom: 12 }}>
+        <button
+          onClick={() => setTab("overview")}
+          style={{
+            background: "none",
+            border: "none",
+            color: tab === "overview" ? colors.primary : colors.muted,
+            cursor: "pointer",
+            fontSize: 13,
+            fontWeight: 600,
+            paddingBottom: 12,
+            borderBottom: tab === "overview" ? `2px solid ${colors.primary}` : "none",
+          }}
+        >
+          Overview
+        </button>
+        <button
+          onClick={() => setTab("advanced")}
+          style={{
+            background: "none",
+            border: "none",
+            color: tab === "advanced" ? colors.primary : colors.muted,
+            cursor: "pointer",
+            fontSize: 13,
+            fontWeight: 600,
+            paddingBottom: 12,
+            borderBottom: tab === "advanced" ? `2px solid ${colors.primary}` : "none",
+            display: "flex",
+            alignItems: "center",
+            gap: 6,
+          }}
+        >
+          <Zap size={14} />
+          Advanced Verification
+        </button>
+      </div>
+
+      {/* Tab Content */}
+      {tab === "overview" && (
+        <>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 16 }}>
         <Card style={{ display: "flex", gap: 20, alignItems: "center" }}>
           <ScoreRing score={emp.sts} />
           <div>
@@ -522,6 +581,59 @@ export function EmployeeDetail({ emp, onBack }: EmployeeDetailProps) {
           </div>
         )}
       </Card>
+        </>
+      )}
+
+      {tab === "advanced" && (
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          {/* Advanced Verification Tab */}
+          {!comprehensiveReport ? (
+            <Card style={{ textAlign: "center", padding: 24 }}>
+              <Zap size={32} color={colors.primary} style={{ margin: "0 auto 12px" }} />
+              <div style={{ fontSize: 14, fontWeight: 600, color: colors.text, marginBottom: 8 }}>
+                Run Comprehensive Verification
+              </div>
+              <div style={{ fontSize: 12, color: colors.muted, marginBottom: 16 }}>
+                Analyze all 5 verification methods (BVN, Payroll, Settlement, Transactions, Duplicates) for complete risk assessment
+              </div>
+              <button
+                onClick={runComprehensive}
+                disabled={comprehensiveLoading}
+                style={{
+                  background: colors.primary,
+                  color: "#fff",
+                  fontWeight: 600,
+                  fontSize: 13,
+                  padding: "12px 24px",
+                  borderRadius: 8,
+                  border: "none",
+                  cursor: comprehensiveLoading ? "not-allowed" : "pointer",
+                  opacity: comprehensiveLoading ? 0.7 : 1,
+                }}
+              >
+                {comprehensiveLoading ? "Running Verification..." : "Start Comprehensive Analysis"}
+              </button>
+            </Card>
+          ) : (
+            <>
+              <button
+                onClick={() => setComprehensiveReport(null)}
+                style={{
+                  background: "none",
+                  border: "none",
+                  color: colors.muted,
+                  cursor: "pointer",
+                  fontSize: 12,
+                  padding: 0,
+                }}
+              >
+                ← Run another verification
+              </button>
+              {comprehensiveReport && <AdvancedVerification verification={comprehensiveReport.summary} />}
+            </>
+          )}
+        </div>
+      )}
     </div>
   );
 }
