@@ -3,21 +3,8 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { colors } from "@/constants/colors";
-import {
-  ArrowRight,
-  CheckCircle,
-  Shield,
-  Zap,
-  Lightbulb,
-  Lock,
-  TrendingUp,
-  Play,
-  Github,
-  Twitter,
-  Linkedin,
-  Mail,
-  Send,
-} from "lucide-react";
+import { ArrowRight, CheckCircle, Shield, Zap, Lightbulb, Lock, TrendingUp, Play, Github, Twitter, Linkedin, Mail, Send } from "lucide-react";
+import { storageUtils } from "@/utils/localStorage";
 
 export default function LandingPage() {
   const [newsletter, setNewsletter] = useState("");
@@ -88,6 +75,7 @@ export default function LandingPage() {
     },
   ];
 
+  console.log(storageUtils.getAuthData("loginData"));
   return (
     <div style={{ background: colors.bg, color: colors.text, overflow: "hidden" }}>
       {/* Responsive Styles */}

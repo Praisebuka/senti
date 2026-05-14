@@ -106,4 +106,26 @@ export const storageUtils = {
       return 0;
     }
   },
+
+
+   /**
+   * Get data from local storage and check if it has expired
+   */
+  getAuthData: (key: string): StorageData | null => {
+    if (typeof window === "undefined") return null;
+
+    try {
+      const item = localStorage.getItem(key);
+      const expiryTime = localStorage.getItem(STORAGE_EXPIRY_KEY(key));
+
+      if (!item || !expiryTime) {
+        return null;
+      }
+
+      return JSON.parse(item);
+    } catch (error) {
+      console.error(`Error reading from localStorage: ${error}`);
+      return null;
+    }
+  }
 };

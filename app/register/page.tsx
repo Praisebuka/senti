@@ -64,9 +64,14 @@ export default function RegisterPage() {
     setError("");
 
     if (!validateForm()) {
-      await alert.showError({
+      // await alert.showError({
+      //   title: "Validation Error",
+      //   message: error,
+      // });
+      Swal.fire({
+        icon: "error",
         title: "Validation Error",
-        message: error,
+        text: error,
       });
       return;
     }
@@ -86,18 +91,20 @@ export default function RegisterPage() {
         await new Promise((innerResolve) => setTimeout(innerResolve, 100));
 
         // Save registration data to localStorage with 10-minute expiry
-        const registrationData = { 
-          ...formData, 
-          registeredAt: new Date().toISOString() 
-        };
+        const registrationData = {  ...formData,  registeredAt: new Date().toISOString() };
         storageUtils.saveWithExpiry("registrationData", registrationData);
 
         // Show success alert and redirect
-        await alert.showSuccess({
-          title: "Registration Successful!",
-          message: `Welcome ${formData.name}! Your account has been created successfully.`,
-        });
+        // await alert.showSuccess({
+        //   title: "Registration Successful!",
+        //   message: `Welcome ${formData.name}! Your account has been created successfully.`,
+        // });
 
+        Swal.fire({
+          icon: "success",
+          title: "Registration Successful!",
+          text: `Welcome ${formData.name}! Your account has been created successfully.`,
+        });
         // Redirect to dashboard
         router.push("/dashboard");
         resolve(null);

@@ -6,9 +6,6 @@ import {
   Activity,
   FileText,
   Network,
-  CheckCircle,
-  XCircle,
-  Loader,
   Zap,
 } from "lucide-react";
 import { colors } from "@/constants/colors";
@@ -16,7 +13,7 @@ import { Card, ScoreRing } from "@/components/shared";
 import { Employee } from "@/types";
 import { verdictColor, squadAction, getComponentColor } from "@/utils/helpers";
 import { getVerdictIcon } from "@/utils/icons";
-import { verifyBVN, BVNVerificationResult } from "@/utils/squadAPI";
+import { verifyBankAccount } from "@/utils/squadAPI";
 import { AdvancedVerification } from "@/components/employees/AdvancedVerification";
 import { runComprehensiveVerification, VerificationReport } from "@/utils/verificationOrchestrator";
 
@@ -29,28 +26,19 @@ export function EmployeeDetail({ emp, onBack }: EmployeeDetailProps) {
   const [tab, setTab] = useState<"overview" | "advanced">("overview");
   const [running, setRunning] = useState(false);
   const [ran, setRan] = useState(false);
-  const [bvnVerifying, setBvnVerifying] = useState(false);
-  const [bvnResult, setBvnResult] = useState<BVNVerificationResult | null>(null);
-  const [bvnVerified, setBvnVerified] = useState(false);
   const [comprehensiveLoading, setComprehensiveLoading] = useState(false);
   const [comprehensiveReport, setComprehensiveReport] = useState<VerificationReport | null>(null);
 
   useEffect(() => {
-    // Auto-verify BVN when component loads
-    runBVNVerification();
-  }, [emp.bvn]);
+    // Auto-verify bank account when component loads
+    runBankVerification();
+  }, [emp.account, emp.bank]);
 
-  const runBVNVerification = async () => {
-    setBvnVerifying(true);
+  const runBankVerification = async () => {
     try {
-      const result = await verifyBVN(emp.bvn, emp.name);
-      setBvnResult(result);
-      setBvnVerified(result.status === "success");
+      await verifyBankAccount(emp.account, emp.bank);
     } catch (error) {
-      console.error("BVN verification error:", error);
-      setBvnVerified(false);
-    } finally {
-      setBvnVerifying(false);
+      console.error("Bank account verification error:", error);
     }
   };
 
@@ -293,83 +281,50 @@ export function EmployeeDetail({ emp, onBack }: EmployeeDetailProps) {
             justifyContent: "space-between",
           }}
         >
-          <span>SQUAD BVN VERIFICATION</span>
-          {bvnVerifying && <Loader size={12} style={{ animation: "spin 1s linear infinite" }} />}
+          <span>SQUAD BANK ACCOUNT VERIFICATION</span>
         </div>
 
-        {bvnResult && (
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr",
-              gap: 12,
-              marginBottom: 12,
-            }}
-          >
-            <div>
-              <div style={{ color: colors.muted, fontSize: 10, marginBottom: 4 }}>
-                Verification Status
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 6,
-                  color: bvnVerified ? colors.success : colors.error,
-                  fontWeight: 600,
-                  fontSize: 13,
-                }}
-              >
-                {bvnVerified ? <CheckCircle size={14} /> : <XCircle size={14} />}
-                {bvnVerified ? "Verified" : "Failed"}
-              </div>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: 12,
+            marginBottom: 12,
+          }}
+        >
+          <div>
+            <div style={{ color: colors.muted, fontSize: 10, marginBottom: 4 }}>
+              Account Number
             </div>
-            <div>
-              <div style={{ color: colors.muted, fontSize: 10, marginBottom: 4 }}>
-                Confidence Score
-              </div>
-              <div style={{ color: colors.text, fontWeight: 600, fontSize: 13 }}>
-                {bvnResult.confidence_score.toFixed(1)}%
-              </div>
-            </div>
-            <div>
-              <div style={{ color: colors.muted, fontSize: 10, marginBottom: 4 }}>
-                Verified Name
-              </div>
-              <div style={{ color: colors.text, fontSize: 12 }}>
-                {bvnResult.data?.verified_name || "N/A"}
-              </div>
-            </div>
-            <div>
-              <div style={{ color: colors.muted, fontSize: 10, marginBottom: 4 }}>
-                Date of Birth
-              </div>
-              <div style={{ color: colors.text, fontSize: 12 }}>
-                {bvnResult.data?.date_of_birth || "N/A"}
-              </div>
-            </div>
-            <div>
-              <div style={{ color: colors.muted, fontSize: 10, marginBottom: 4 }}>
-                Gender
-              </div>
-              <div style={{ color: colors.text, fontSize: 12 }}>
-                {bvnResult.data?.gender || "N/A"}
-              </div>
-            </div>
-            <div>
-              <div style={{ color: colors.muted, fontSize: 10, marginBottom: 4 }}>
-                Marital Status
-              </div>
-              <div style={{ color: colors.text, fontSize: 12 }}>
-                {bvnResult.data?.marital_status || "N/A"}
-              </div>
+            <div style={{ color: colors.text, fontWeight: 600, fontSize: 13 }}>
+              {emp.account}
             </div>
           </div>
-        )}
+          <div>
+            <div style={{ color: colors.muted, fontSize: 10, marginBottom: 4 }}>
+              Bank Code
+            </div>
+            <div style={{ color: colors.text, fontSize: 12 }}>
+              {emp.bank}
+            </div>
+          </div>
+        </div>
+
+        <div
+          style={{
+            padding: 12,
+            background: colors.warning + "20",
+            borderRadius: 6,
+            border: `1px solid ${colors.warning}40`,
+            fontSize: 12,
+            color: colors.text,
+          }}
+        >
+          Real bank verification is pending account upload and Squad API setup
+        </div>
 
         <button
-          onClick={runBVNVerification}
-          disabled={bvnVerifying}
+          onClick={runBankVerification}
           style={{
             background: colors.info,
             color: "#fff",
@@ -378,12 +333,12 @@ export function EmployeeDetail({ emp, onBack }: EmployeeDetailProps) {
             padding: "8px 16px",
             borderRadius: 6,
             border: "none",
-            cursor: bvnVerifying ? "not-allowed" : "pointer",
-            opacity: bvnVerifying ? 0.7 : 1,
+            cursor: "pointer",
             width: "100%",
+            marginTop: 12,
           }}
         >
-          {bvnVerifying ? "Verifying BVN with Squad..." : "Re-verify BVN"}
+          Verify Bank Account
         </button>
       </Card>
 
