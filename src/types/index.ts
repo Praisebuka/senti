@@ -13,6 +13,26 @@ export interface Employee {
   network: number;
   verdict: Verdict;
   flags: string[];
+  aiRiskScore?: number;
+  verificationStatus?: "pending" | "verified" | "flagged" | "blocked";
+}
+
+export interface ComprehensiveVerification {
+  identityScore: number;
+  financialScore: number;
+  behavioralScore: number;
+  networkScore: number;
+  temporalScore: number;
+  overallRiskScore: number;
+  riskLevel: "low" | "medium" | "high" | "critical";
+  recommendation: string;
+  verifications: {
+    bvn?: any;
+    payroll?: any;
+    settlement?: any;
+    transaction?: any;
+    duplicates?: any;
+  };
 }
 
 export type Verdict = "TRUSTED" | "VERIFIED" | "REVIEW" | "SUSPECT" | "FLAGGED";

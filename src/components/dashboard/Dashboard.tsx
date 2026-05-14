@@ -41,6 +41,15 @@ export const Dashboard: React.FC = () => {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+      <style>{`
+        @media (max-width: 500px) {
+          .ring_and_co {
+            display: flex !important;
+            flex-direction: column;
+          }
+        }`}
+      </style>
+
       <div
         style={{
           display: "grid",
@@ -77,7 +86,7 @@ export const Dashboard: React.FC = () => {
         />
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }} className="ring_and_co">
         <Card>
           <div style={{ color: colors.muted, fontSize: 12, marginBottom: 14 }}>
             VERDICT DISTRIBUTION

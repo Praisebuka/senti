@@ -8,14 +8,12 @@ import {
   ArrowLeft,
   Upload,
   Search,
-  CheckCircle,
   Lock,
   Database,
   Shield,
   Zap,
   BarChart3,
   Users,
-  Clock,
   AlertCircle,
 } from "lucide-react";
 

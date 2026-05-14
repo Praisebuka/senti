@@ -4,7 +4,7 @@ import { colors } from "@/constants/colors";
 export const getVerdictColor = (verdict: Verdict): string => {
   const colorMap: Record<Verdict, string> = {
     TRUSTED: colors.green,
-    VERIFIED: colors.blue,
+    VERIFIED: colors.info,
     REVIEW: colors.amber,
     SUSPECT: "#FF8C00",
     FLAGGED: colors.red,
@@ -29,7 +29,7 @@ export const calculateStsPercentage = (score: number): number => {
 
 export const getStsColor = (score: number): string => {
   if (score >= 800) return colors.green;
-  if (score >= 600) return colors.blue;
+  if (score >= 600) return colors.info;
   if (score >= 400) return colors.amber;
   return colors.red;
 };
