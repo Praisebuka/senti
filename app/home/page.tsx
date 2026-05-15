@@ -775,7 +775,7 @@ export default function LandingPage() {
               Join companies like Squad who trust CORE-CONNECT for enterprise credential verification.
             </p>
 
-            <Link href="/auth/register" style={{ textDecoration: "none" }}>
+            <Link href="/register" style={{ textDecoration: "none" }}>
               <button
                 style={{
                   padding: "16px 40px",

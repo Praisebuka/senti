@@ -212,8 +212,16 @@ export function AdvancedVerification({ verification, loading }: AdvancedVerifica
                 <VerificationMethod
                   name="BVN Verification"
                   status={verification.verifications.bvn.status}
-                  confidence={verification.verifications.bvn.data?.verified_name ? 95 : 0}
-                  details={verification.verifications.bvn.data?.verified_name}
+                  confidence={verification.verifications.bvn.confidence}
+                  details={verification.verifications.bvn.data?.verified_name ? `Verified: ${verification.verifications.bvn.data.verified_name}` : verification.verifications.bvn.issues?.[0]}
+                />
+              )}
+              {verification.verifications.sanctions && (
+                <VerificationMethod
+                  name="Sanctions Check"
+                  status={verification.verifications.sanctions.is_sanctioned ? "error" : "success"}
+                  confidence={verification.verifications.sanctions.match_confidence}
+                  details={verification.verifications.sanctions.details}
                 />
               )}
               {verification.verifications.payroll && (

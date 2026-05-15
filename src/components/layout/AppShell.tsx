@@ -22,6 +22,7 @@ import { Dashboard } from "@/components/dashboard/Dashboard";
 import { EmployeeList } from "@/components/employees/EmployeeList";
 import { EmployeeDetail } from "@/components/employees/EmployeeDetail";
 import { CredentialVerifier } from "@/components/employees/CredentialVerifier";
+import { SanctionsTester } from "@/components/shared/SanctionsTester";
 import { Employee } from "@/types";
 import { Card } from "@/components/shared/Card";
 import { storageUtils } from "@/utils/localStorage";
@@ -35,6 +36,7 @@ const NAV = [
   },
   { id: "employees", label: "Employees", icon: <Users size={16} /> },
   { id: "credential", label: "Credentials", icon: <FileText size={16} /> },
+  { id: "sanctions", label: "Sanctions Test", icon: <Shield size={16} /> },
   { id: "analytics", label: "Analytics", icon: <BarChart3 size={16} /> },
   { id: "reports", label: "Reports", icon: <TrendingUp size={16} /> },
 ];
@@ -92,6 +94,8 @@ export function AppShell() {
       ? selected?.name
       : view === "credential"
       ? "Credential Verifier"
+      : view === "sanctions"
+      ? "Sanctions Check Tester"
       : view === "analytics"
       ? "Analytics"
       : view === "reports"
@@ -537,6 +541,7 @@ export function AppShell() {
               <EmployeeDetail emp={selected} onBack={handleBack} />
             )}
             {view === "credential" && <CredentialVerifier />}
+            {view === "sanctions" && <SanctionsTester />}
             {view === "analytics" && (
               <Card style={{ textAlign: "center", padding: 60 }}>
                 <BarChart3
