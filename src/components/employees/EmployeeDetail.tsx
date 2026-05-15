@@ -16,6 +16,7 @@ import { getVerdictIcon } from "@/utils/icons";
 import { verifyBankAccount } from "@/utils/squadAPI";
 import { AdvancedVerification } from "@/components/employees/AdvancedVerification";
 import { runComprehensiveVerification, VerificationReport } from "@/utils/verificationOrchestrator";
+import { PaymentExecutor } from "@/components/employees/PaymentExecutor";
 
 interface EmployeeDetailProps {
   emp: Employee;
@@ -536,6 +537,13 @@ export function EmployeeDetail({ emp, onBack }: EmployeeDetailProps) {
           </div>
         )}
       </Card>
+
+      <PaymentExecutor
+        employee={emp}
+        verdict={emp.verdict}
+        sts_score={emp.sts}
+        amount={emp.salary * 100}
+      />
         </>
       )}
 

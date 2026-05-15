@@ -117,24 +117,42 @@ export function SanctionsTester() {
                 <CheckCircle size={16} color={colors.success} />
               )}
             </div>
-            <div>
+            <div style={{ flex: 1 }}>
               <div
                 style={{
                   color: result.is_sanctioned ? colors.error : colors.success,
                   fontSize: 12,
                   fontWeight: 600,
-                  marginBottom: 4,
+                  marginBottom: 8,
                 }}
               >
-                {result.is_sanctioned ? "🚨 SANCTIONED" : "✓ CLEAR"}
+                {result.is_sanctioned ? "🚨 SANCTIONS ALERT" : "✓ CLEAR"}
               </div>
-              <div style={{ color: colors.muted, fontSize: 11 }}>
-                {result.details || result.message}
-              </div>
-              {result.lists && result.lists.length > 0 && (
-                <div style={{ color: colors.text, fontSize: 11, marginTop: 4 }}>
-                  Lists: {result.lists.join(", ")}
-                </div>
+
+              {result.is_sanctioned ? (
+                <>
+                  <div style={{ color: colors.text, fontSize: 12, marginBottom: 8, lineHeight: 1.5 }}>
+                    <strong>{name}</strong> matches {result.lists.join(" + ")} sanctions list(s) with {result.match_confidence}% confidence.
+                  </div>
+                  <div style={{ background: `${colors.error}25`, padding: 8, borderRadius: 4, marginBottom: 8, fontSize: 11, color: colors.text }}>
+                    <strong>⚠️ Impact:</strong> This employee <strong>CANNOT</strong> receive payments via Squad or any banking channel. Transfer must be BLOCKED immediately.
+                  </div>
+                  <div style={{ fontSize: 11, color: colors.muted }}>
+                    <strong>Action Required:</strong> Manual compliance review by legal/compliance team before any disbursement.
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div style={{ color: colors.text, fontSize: 12, marginBottom: 8 }}>
+                    <strong>{name}</strong> is <strong>NOT</strong> listed on OFAC SDN, UN Consolidated, or PEP databases.
+                  </div>
+                  <div style={{ background: `${colors.success}25`, padding: 8, borderRadius: 4, marginBottom: 8, fontSize: 11, color: colors.text }}>
+                    <strong>✓ Status:</strong> Employee clears sanctions screening. Safe to proceed with Squad payment processing.
+                  </div>
+                  <div style={{ fontSize: 11, color: colors.muted }}>
+                    <strong>Next Step:</strong> Verify BVN + bank account details before executing transfer.
+                  </div>
+                </>
               )}
             </div>
           </div>
