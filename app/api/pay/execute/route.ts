@@ -80,7 +80,7 @@ export async function POST(req: NextRequest) {
           transaction_id: data.data?.id,
           squad_reference: data.data?.reference,
           audit_reference: audit_ref,
-          transaction_reference: transaction_ref,
+          transaction_reference: body.transaction_reference ?? data?.transaction_ref ?? null,
           amount: body.amount,
           account_number: body.account_number,
           employee_id: body.employee_id,
