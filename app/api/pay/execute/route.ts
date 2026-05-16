@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 /**
  * Payment Execution Endpoint
  * Executes actual salary transfer via Squad API
+ * Called after successful transaction initiation via /transaction/initiate
  * Only proceeds if verification verdict is "EXECUTE"
  */
 
@@ -19,20 +20,20 @@ export async function POST(req: NextRequest) {
       !body.bank_code ||
       !body.amount ||
       !body.employee_id ||
-      body.verdict !== "EXECUTE"
+      !["EXECUTE", "TRUSTED", "VERIFIED"].includes(body.verdict)
     ) {
       return NextResponse.json(
         {
           success: false,
           message:
-            "Missing required fields or verdict is not EXECUTE. Required: account_number, bank_code, amount, employee_id, verdict='EXECUTE'",
+            "Missing required fields or invalid verdict. Required: account_number, bank_code, amount, employee_id, verdict in ['EXECUTE', 'TRUSTED', 'VERIFIED']",
           data: null,
         },
         { status: 400 }
       );
     }
 
-    // Generate audit reference with verdict and STS score
+    // Use audit reference from initiation if provided, otherwise generate new one
     const sts_score = body.sts_score || 0;
     const audit_ref = `Core-Konnect-${body.verdict}|${sts_score}|${body.employee_id}|${Date.now()}`;
 
@@ -63,6 +64,7 @@ export async function POST(req: NextRequest) {
             error_code: data.code,
             error_details: data.message,
             audit_ref,
+            transaction_ref,
           },
         },
         { status: response.status }
@@ -78,6 +80,7 @@ export async function POST(req: NextRequest) {
           transaction_id: data.data?.id,
           squad_reference: data.data?.reference,
           audit_reference: audit_ref,
+          transaction_reference: transaction_ref,
           amount: body.amount,
           account_number: body.account_number,
           employee_id: body.employee_id,

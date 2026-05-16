@@ -109,10 +109,8 @@ export interface EmployeeVerificationProfile {
  * Verify bank account holder name before processing payments
  * Endpoint: POST /payout/account/lookup
  */
-export async function verifyBankAccount(
-  accountNumber: string,
-  bankCode: string
-): Promise<AccountLookupResult> {
+export async function verifyBankAccount( accountNumber: string, bankCode: string ): Promise<AccountLookupResult> 
+{
   try {
     const response = await fetch(`${SQUAD_BASE_URL}/payout/account/lookup`, {
       method: "POST",

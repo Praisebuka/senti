@@ -32,6 +32,9 @@ export function EmployeeDetail({ emp, onBack }: EmployeeDetailProps) {
   const [comprehensiveReport, setComprehensiveReport] = useState<VerificationReport | null>(null);
   const [ruleResult, setRuleResult] = useState<VerificationResult | null>(null);
   const [ruleLoading, setRuleLoading] = useState(false);
+  const [bankVerificationLoading, setBankVerificationLoading] = useState(false);
+  const [bankVerificationError, setBankVerificationError] = useState<string | null>(null);
+  const [bankVerificationResult, setBankVerificationResult] = useState<any | null>(null);
 
   useEffect(() => {
     // Auto-verify bank account when component loads
@@ -39,29 +42,41 @@ export function EmployeeDetail({ emp, onBack }: EmployeeDetailProps) {
   }, [emp.account, emp.bank]);
 
   const runBankVerification = async () => {
-  setRuleLoading(true);
-  try {
-    const bankCode = getBankCode(emp.bank);
-    const bankResult = await verifyBankAccount(emp.account, bankCode);
+    setBankVerificationLoading(true);
+    setBankVerificationError(null);
+    setBankVerificationResult(null);
+    setRuleLoading(true);
+    try {
+      // const bankCode = getBankCode(emp.bank);
+      const bankResult = await verifyBankAccount(emp.account, emp.bank);
 
-    const squadAccountName = bankResult.success && bankResult.data?.account_name
-      ? bankResult.data.account_name
-      : emp.name; // fallback to payroll name if Squad call fails
+      // console.log(bankCode, emp.bank);
+      if (!bankResult || !bankResult.success) {
+        setBankVerificationError(bankResult?.message || "Unable to verify account");
+      } else {
+        setBankVerificationResult(bankResult.data || null);
+      }
 
-    const result = await verifyEmployee(
-      "demo-org",        // org ID — replace with real org ID when auth is added
-      emp.name,
-      emp.account,
-      squadAccountName
-    );
+      const squadAccountName = bankResult && bankResult.success && bankResult.data?.account_name
+        ? bankResult.data.account_name
+        : emp.name; // fallback to payroll name if Squad call fails
 
-    setRuleResult(result);
-  } catch (error) {
-    console.error("Verification error:", error);
-  } finally {
-    setRuleLoading(false);
-  }
-};
+      const result = await verifyEmployee(
+        "demo-org",        // org ID — replace with real org ID when auth is added
+        emp.name,
+        emp.account,
+        squadAccountName
+      );
+
+      setRuleResult(result);
+    } catch (error) {
+      console.error("Verification error:", error);
+      setBankVerificationError("Verification failed");
+    } finally {
+      setRuleLoading(false);
+      setBankVerificationLoading(false);
+    }
+  };
 
   const runComprehensive = async () => {
     setComprehensiveLoading(true);
@@ -110,6 +125,10 @@ export function EmployeeDetail({ emp, onBack }: EmployeeDetailProps) {
         @keyframes spin {
           from { transform: rotate(0deg); }
           to { transform: rotate(360deg); }
+        }
+        @keyframes pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.5; }
         }
       `}</style>
       <button
@@ -305,6 +324,74 @@ export function EmployeeDetail({ emp, onBack }: EmployeeDetailProps) {
           <span>SQUAD BANK ACCOUNT VERIFICATION</span>
         </div>
 
+        {bankVerificationLoading && (
+          <div
+            style={{
+              padding: 16,
+              textAlign: "center",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 12,
+              marginBottom: 12,
+            }}
+          >
+            <div
+              style={{
+                width: 32,
+                height: 32,
+                borderRadius: "50%",
+                border: `3px solid ${colors.border}`,
+                borderTopColor: colors.primary,
+                animation: "spin 1s linear infinite",
+              }}
+            />
+            <div style={{ color: colors.muted, fontSize: 12 }}>
+              Verifying account details...
+            </div>
+          </div>
+        )}
+
+        {bankVerificationError && (
+          <div
+            style={{
+              padding: 12,
+              background: colors.error + "20",
+              borderRadius: 6,
+              border: `1px solid ${colors.error}40`,
+              fontSize: 12,
+              color: colors.error,
+              marginBottom: 12,
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+            }}
+          >
+            <AlertTriangle size={14} />
+            {bankVerificationError}
+          </div>
+        )}
+
+        {!bankVerificationLoading && bankVerificationResult && (
+          <div
+            style={{
+              padding: 12,
+              background: colors.success + "20",
+              borderRadius: 6,
+              border: `1px solid ${colors.success}40`,
+              fontSize: 12,
+              color: colors.success,
+              marginBottom: 12,
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+            }}
+          >
+            <span>✓</span>
+            Account verified: {bankVerificationResult.account_name}
+          </div>
+        )}
+
         <div
           style={{
             display: "grid",
@@ -380,20 +467,42 @@ export function EmployeeDetail({ emp, onBack }: EmployeeDetailProps) {
 
         <button
           onClick={runBankVerification}
+          disabled={bankVerificationLoading}
           style={{
-            background: colors.info,
+            background: bankVerificationLoading ? colors.muted : colors.info,
             color: "#fff",
             fontWeight: 600,
             fontSize: 12,
             padding: "8px 16px",
             borderRadius: 6,
             border: "none",
-            cursor: "pointer",
+            cursor: bankVerificationLoading ? "not-allowed" : "pointer",
             width: "100%",
             marginTop: 12,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 8,
+            opacity: bankVerificationLoading ? 0.7 : 1,
           }}
         >
-          Verify Bank Account
+          {bankVerificationLoading ? (
+            <>
+              <div
+                style={{
+                  width: 12,
+                  height: 12,
+                  borderRadius: "50%",
+                  border: `2px solid rgba(255,255,255,0.3)`,
+                  borderTopColor: "#fff",
+                  animation: "spin 1s linear infinite",
+                }}
+              />
+              Verifying...
+            </>
+          ) : (
+            "Verify Bank Account"
+          )}
         </button>
       </Card>
 
