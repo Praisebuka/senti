@@ -1,4 +1,4 @@
-# Core-Connect: Quick Reference Card
+# Core-Konnect: Quick Reference Card
 
 ## 🎯 The Ask vs. Delivery
 
@@ -32,7 +32,7 @@
 PROBLEM: ₦50B+ lost annually to payroll fraud
           (ghost employees, sanctioned individuals)
 
-SOLUTION: Core-Connect
+SOLUTION: Core-Konnect
           ├─ AI-powered verification (5 dimensions)
           ├─ Squad API integration (real payments)
           ├─ Risk scoring → 5-tier verdict
@@ -104,7 +104,7 @@ src/components/employees/PaymentExecutor.tsx
 app/api/generate/summary/route.ts
     └─ PDF generator endpoint (GET /api/generate/summary)
 
-public/Core-Connect-Summary.pdf
+public/Core-Konnect-Summary.pdf
     └─ Static PDF summary
 
 PAYMENT_EXECUTION_GUIDE.md
@@ -173,7 +173,7 @@ A: Yes! Calls Squad sandbox API (not real money, test environment only)
 A: Payment blocked, STS = 95, verdict = BLOCK automatically
 
 **Q: How's the audit trail stored?**
-A: In the reference field: `Core-Connect-{VERDICT}|{STS}|{ID}|{TIMESTAMP}`
+A: In the reference field: `Core-Konnect-{VERDICT}|{STS}|{ID}|{TIMESTAMP}`
 
 **Q: Can I deploy this to production?**
 A: Yes—just update `SQUAD_SECRET_KEY` and `SQUAD_BASE_URL` env vars

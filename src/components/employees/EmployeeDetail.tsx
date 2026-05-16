@@ -181,7 +181,7 @@ export function EmployeeDetail({ emp, onBack }: EmployeeDetailProps) {
                 marginBottom: 4,
               }}
             >
-              Core-Connect TRUST SCORE
+              Core-Konnect TRUST SCORE
             </div>
             <div
               style={{
@@ -272,7 +272,7 @@ export function EmployeeDetail({ emp, onBack }: EmployeeDetailProps) {
             <br />
             amount: {emp.salary * 100} (kobo)
             <br />
-            ref: Core-Connect-{emp.verdict}|{emp.sts}|{emp.id}
+            ref: Core-Konnect-{emp.verdict}|{emp.sts}|{emp.id}
             <br />
             status:{" "}
             <span
@@ -367,7 +367,7 @@ export function EmployeeDetail({ emp, onBack }: EmployeeDetailProps) {
               </div>
             )}
             <div style={{ marginTop: 6, color: colors.muted, fontSize: 11 }}>
-              Human review required before any payroll action is taken.
+              ⚠ Core-Konnect flags for review, not for automatic action. A human officer makes the final call. False positives are possible and expected in edge cases.
             </div>
           </div>
         )}
@@ -539,7 +539,7 @@ export function EmployeeDetail({ emp, onBack }: EmployeeDetailProps) {
             gap: 8,
           }}
         >
-          {running ? "Running Core-Connect AI…" : ran ? "✓ Verification Complete — Rerun" : "Run Full Verification"}
+          {running ? "Running Core-Konnect AI…" : ran ? "✓ Verification Complete — Rerun" : "Run Full Verification"}
         </button>
         {running && (
           <div

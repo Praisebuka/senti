@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
 
     // Generate audit reference with verdict and STS score
     const sts_score = body.sts_score || 0;
-    const audit_ref = `Core-Connect-${body.verdict}|${sts_score}|${body.employee_id}|${Date.now()}`;
+    const audit_ref = `Core-Konnect-${body.verdict}|${sts_score}|${body.employee_id}|${Date.now()}`;
 
     // Call Squad's Transfer API
     const response = await fetch(`${SQUAD_BASE_URL}/payout/transfer`, {
@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
         bank_code: body.bank_code,
         amount: body.amount, // in kobo (smallest unit)
         ref: audit_ref,
-        remark: body.remark || "Verified Payroll - Core-Connect",
+        remark: body.remark || "Verified Payroll - Core-Konnect",
       }),
     });
 
