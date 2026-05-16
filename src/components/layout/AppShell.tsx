@@ -1,4 +1,5 @@
 "use client";
+import { UploadedEmployeeList } from "@/components/employees/UploadedEmployeeList";
 import { AnalyticsDashboard } from "@/components/analytics/AnalyticsDashboard";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -535,7 +536,9 @@ export function AppShell() {
           >
             {view === "dashboard" && <Dashboard />}
             {view === "employees" && (
-              <EmployeeList onSelect={handleSelectEmployee} />
+              <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+                <UploadedEmployeeList />
+              </div>
             )}
             {view === "empdetail" && selected && (
               <EmployeeDetail emp={selected} onBack={handleBack} />
