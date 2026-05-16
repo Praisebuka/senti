@@ -7,6 +7,7 @@ import { Card } from "@/components/shared/Card";
 import { Employee } from "@/types";
 import { useAlert } from "@/hooks/useAlert";
 import Swal from "sweetalert2";
+import { VerificationResult } from "@/utils/ruleEngine";
 
 interface PaymentExecutorProps {
   employee: Employee;
@@ -50,6 +51,8 @@ export function PaymentExecutor({ employee, verdict, sts_score, amount = 285000,
   const alert = useAlert();
 
   const canExecute = ["EXECUTE", "TRUSTED", "VERIFIED"].includes(verdict) && sts_score >= 750;
+
+  const [ruleResult, setRuleResult] = useState<VerificationResult | null>(null);
 
   const handleInitiatePayment = async () => {
     if (!canExecute) {
@@ -366,6 +369,7 @@ export function PaymentExecutor({ employee, verdict, sts_score, amount = 285000,
           </div>
         </div>
       </div>
+      
 
       {/* Action Button - Initiate Payment Flow */}
       <button
@@ -375,10 +379,10 @@ export function PaymentExecutor({ employee, verdict, sts_score, amount = 285000,
           width: "100%",
           padding: "12px 16px",
           borderRadius: 8,
-          background: canExecute ? colors.primary : colors.border,
-          color: canExecute ? "#fff" : colors.muted,
+          background: ruleResult?.verdict === "TRUSTED" ? colors.primary : colors.border,
+          color: ruleResult?.verdict === "TRUSTED" ? "#fff" : colors.muted,
           border: "none",
-          cursor: canExecute ? "pointer" : "not-allowed",
+          cursor: ruleResult?.verdict === "TRUSTED" ? "pointer" : "not-allowed",
           fontWeight: 600,
           fontSize: 14,
           display: "flex",

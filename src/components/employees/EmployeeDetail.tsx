@@ -32,37 +32,51 @@ export function EmployeeDetail({ emp, onBack }: EmployeeDetailProps) {
   const [comprehensiveReport, setComprehensiveReport] = useState<VerificationReport | null>(null);
   const [ruleResult, setRuleResult] = useState<VerificationResult | null>(null);
   const [ruleLoading, setRuleLoading] = useState(false);
+  const [bankVerificationLoading, setBankVerificationLoading] = useState(false);
+  const [bankVerificationError, setBankVerificationError] = useState<string | null>(null);
+  const [bankVerificationResult, setBankVerificationResult] = useState<any | null>(null);
 
   useEffect(() => {
     // Auto-verify bank account when component loads
     runBankVerification();
   }, [emp.account, emp.bank]);
 
-  console.log(emp);
   const runBankVerification = async () => {
-  setRuleLoading(true);
-  try {
-    const bankCode = getBankCode(emp.bank);
-    const bankResult = await verifyBankAccount(emp.account, bankCode);
+    setBankVerificationLoading(true);
+    setBankVerificationError(null);
+    setBankVerificationResult(null);
+    setRuleLoading(true);
+    try {
+      // const bankCode = getBankCode(emp.bank);
+      const bankResult = await verifyBankAccount(emp.account, emp.bank);
 
-    const squadAccountName = bankResult.success && bankResult.data?.account_name
-      ? bankResult.data.account_name
-      : emp.name; // fallback to payroll name if Squad call fails
+      // console.log(bankCode, emp.bank);
+      if (!bankResult || !bankResult.success) {
+        setBankVerificationError(bankResult?.message || "Unable to verify account");
+      } else {
+        setBankVerificationResult(bankResult.data || null);
+      }
 
-    const result = await verifyEmployee(
-      "demo-org",        // org ID — replace with real org ID when auth is added
-      emp.name,
-      emp.account,
-      squadAccountName
-    );
+      const squadAccountName = bankResult && bankResult.success && bankResult.data?.account_name
+        ? bankResult.data.account_name
+        : emp.name; // fallback to payroll name if Squad call fails
 
-    setRuleResult(result);
-  } catch (error) {
-    console.error("Verification error:", error);
-  } finally {
-    setRuleLoading(false);
-  }
-};
+      const result = await verifyEmployee(
+        "demo-org",        // org ID — replace with real org ID when auth is added
+        emp.name,
+        emp.account,
+        squadAccountName
+      );
+
+      setRuleResult(result);
+    } catch (error) {
+      console.error("Verification error:", error);
+      setBankVerificationError("Verification failed");
+    } finally {
+      setRuleLoading(false);
+      setBankVerificationLoading(false);
+    }
+  };
 
   const runComprehensive = async () => {
     setComprehensiveLoading(true);
