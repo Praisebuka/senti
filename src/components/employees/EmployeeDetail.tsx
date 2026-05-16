@@ -13,7 +13,8 @@ import { Card, ScoreRing } from "@/components/shared";
 import { Employee } from "@/types";
 import { verdictColor, squadAction, getComponentColor } from "@/utils/helpers";
 import { getVerdictIcon } from "@/utils/icons";
-import { verifyBankAccount } from "@/utils/squadAPI";
+import { verifyBankAccount, getBankCode } from "@/utils/squadAPI";
+import { verifyEmployee, VerificationResult } from "@/utils/ruleEngine";
 import { AdvancedVerification } from "@/components/employees/AdvancedVerification";
 import { runComprehensiveVerification, VerificationReport } from "@/utils/verificationOrchestrator";
 import { PaymentExecutor } from "@/components/employees/PaymentExecutor";
@@ -29,6 +30,8 @@ export function EmployeeDetail({ emp, onBack }: EmployeeDetailProps) {
   const [ran, setRan] = useState(false);
   const [comprehensiveLoading, setComprehensiveLoading] = useState(false);
   const [comprehensiveReport, setComprehensiveReport] = useState<VerificationReport | null>(null);
+  const [ruleResult, setRuleResult] = useState<VerificationResult | null>(null);
+  const [ruleLoading, setRuleLoading] = useState(false);
 
   useEffect(() => {
     // Auto-verify bank account when component loads
@@ -36,12 +39,29 @@ export function EmployeeDetail({ emp, onBack }: EmployeeDetailProps) {
   }, [emp.account, emp.bank]);
 
   const runBankVerification = async () => {
-    try {
-      await verifyBankAccount(emp.account, emp.bank);
-    } catch (error) {
-      console.error("Bank account verification error:", error);
-    }
-  };
+  setRuleLoading(true);
+  try {
+    const bankCode = getBankCode(emp.bank);
+    const bankResult = await verifyBankAccount(emp.account, bankCode);
+
+    const squadAccountName = bankResult.success && bankResult.data?.account_name
+      ? bankResult.data.account_name
+      : emp.name; // fallback to payroll name if Squad call fails
+
+    const result = await verifyEmployee(
+      "demo-org",        // org ID — replace with real org ID when auth is added
+      emp.name,
+      emp.account,
+      squadAccountName
+    );
+
+    setRuleResult(result);
+  } catch (error) {
+    console.error("Verification error:", error);
+  } finally {
+    setRuleLoading(false);
+  }
+};
 
   const runComprehensive = async () => {
     setComprehensiveLoading(true);
@@ -311,18 +331,52 @@ export function EmployeeDetail({ emp, onBack }: EmployeeDetailProps) {
           </div>
         </div>
 
-        <div
-          style={{
-            padding: 12,
-            background: colors.warning + "20",
-            borderRadius: 6,
-            border: `1px solid ${colors.warning}40`,
-            fontSize: 12,
-            color: colors.text,
-          }}
-        >
-          Real bank verification is pending account upload and Squad API setup
-        </div>
+       {ruleLoading && (
+          <div style={{ padding: 12, fontSize: 12, color: colors.muted }}>
+            Running Squad verification + rule engine…
+          </div>
+        )}
+
+        {ruleResult && !ruleLoading && (
+          <div
+            style={{
+              padding: 12,
+              background: ruleResult.verdict === "TRUSTED"
+                ? colors.success + "18"
+                : colors.error + "18",
+              borderRadius: 6,
+              border: `1px solid ${ruleResult.verdict === "TRUSTED" ? colors.success : colors.error}40`,
+              fontSize: 12,
+              color: colors.text,
+            }}
+          >
+            <div style={{ fontWeight: 700, marginBottom: 6, color: ruleResult.verdict === "TRUSTED" ? colors.success : colors.error }}>
+              {ruleResult.verdict === "TRUSTED" ? "✓ All rules passed — TRUSTED" : `⚠ FLAGGED — Rule ${ruleResult.rule_triggered} triggered`}
+            </div>
+            {ruleResult.reason && (
+              <div style={{ color: colors.muted }}>{ruleResult.reason}</div>
+            )}
+            {ruleResult.similarity_score !== undefined && (
+              <div style={{ color: colors.muted, marginTop: 4 }}>
+                Name similarity score: {(ruleResult.similarity_score * 100).toFixed(0)}%
+              </div>
+            )}
+            {ruleResult.matched_employee && (
+              <div style={{ color: colors.error, marginTop: 4 }}>
+                Matched with: {ruleResult.matched_employee}
+              </div>
+            )}
+            <div style={{ marginTop: 6, color: colors.muted, fontSize: 11 }}>
+              Human review required before any payroll action is taken.
+            </div>
+          </div>
+        )}
+
+        {!ruleResult && !ruleLoading && (
+          <div style={{ padding: 12, fontSize: 12, color: colors.muted, background: colors.surface, borderRadius: 6 }}>
+            Click "Verify Bank Account" to run the rule engine
+          </div>
+        )}
 
         <button
           onClick={runBankVerification}
