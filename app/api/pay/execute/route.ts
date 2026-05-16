@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 /**
  * Payment Execution Endpoint
  * Executes actual salary transfer via Squad API
+ * Called after successful transaction initiation via /transaction/initiate
  * Only proceeds if verification verdict is "EXECUTE"
  */
 
@@ -19,22 +20,37 @@ export async function POST(req: NextRequest) {
       !body.bank_code ||
       !body.amount ||
       !body.employee_id ||
-      body.verdict !== "EXECUTE"
+      !["EXECUTE", "TRUSTED", "VERIFIED"].includes(body.verdict)
     ) {
       return NextResponse.json(
         {
           success: false,
           message:
-            "Missing required fields or verdict is not EXECUTE. Required: account_number, bank_code, amount, employee_id, verdict='EXECUTE'",
+            "Missing required fields or invalid verdict. Required: account_number, bank_code, amount, employee_id, verdict in ['EXECUTE', 'TRUSTED', 'VERIFIED']",
           data: null,
         },
         { status: 400 }
       );
     }
 
-    // Generate audit reference with verdict and STS score
+    // Use audit reference from initiation if provided, otherwise generate new one
     const sts_score = body.sts_score || 0;
-    const audit_ref = `Core-Connect-${body.verdict}|${sts_score}|${body.employee_id}|${Date.now()}`;
+    const audit_ref = body.audit_reference || `Core-Connect-${body.verdict}|${sts_score}|${body.employee_id}|${Date.now()}`;
+    const transaction_ref = body.transaction_reference;
+
+    // Build payload for execution
+    const executePayload: any = {
+      account: body.account_number,
+      bank_code: body.bank_code,
+      amount: body.amount, // in kobo (smallest unit)
+      ref: audit_ref,
+      remark: body.remark || "Verified Payroll Execution - Core-Connect",
+    };
+
+    // If transaction reference from initiation exists, include it
+    if (transaction_ref) {
+      executePayload.transaction_ref = transaction_ref;
+    }
 
     // Call Squad's Transfer API
     const response = await fetch(`${SQUAD_BASE_URL}/payout/transfer`, {
@@ -43,13 +59,7 @@ export async function POST(req: NextRequest) {
         Authorization: `Bearer ${SQUAD_API_KEY}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        account: body.account_number,
-        bank_code: body.bank_code,
-        amount: body.amount, // in kobo (smallest unit)
-        ref: audit_ref,
-        remark: body.remark || "Verified Payroll - Core-Connect",
-      }),
+      body: JSON.stringify(executePayload),
     });
 
     const data = await response.json();
@@ -63,6 +73,7 @@ export async function POST(req: NextRequest) {
             error_code: data.code,
             error_details: data.message,
             audit_ref,
+            transaction_ref,
           },
         },
         { status: response.status }
@@ -78,6 +89,7 @@ export async function POST(req: NextRequest) {
           transaction_id: data.data?.id,
           squad_reference: data.data?.reference,
           audit_reference: audit_ref,
+          transaction_reference: transaction_ref,
           amount: body.amount,
           account_number: body.account_number,
           employee_id: body.employee_id,

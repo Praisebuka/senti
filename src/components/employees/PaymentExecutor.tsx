@@ -6,12 +6,26 @@ import { colors } from "@/constants/colors";
 import { Card } from "@/components/shared/Card";
 import { Employee } from "@/types";
 import { useAlert } from "@/hooks/useAlert";
+import Swal from "sweetalert2";
 
 interface PaymentExecutorProps {
   employee: Employee;
   verdict: string;
   sts_score: number;
   amount?: number;
+}
+
+interface InitiateResult {
+  success: boolean;
+  data?: {
+    transaction_reference: string;
+    transaction_id: string;
+    audit_reference: string;
+    amount: number;
+    status: string;
+    timestamp: string;
+  };
+  message?: string;
 }
 
 interface PaymentResult {
@@ -27,33 +41,125 @@ interface PaymentResult {
   message?: string;
 }
 
-export function PaymentExecutor({
-  employee,
-  verdict,
-  sts_score,
-  amount = 285000,
-}: PaymentExecutorProps) {
+export function PaymentExecutor({ employee, verdict, sts_score, amount = 285000, }: PaymentExecutorProps) 
+{
+  const [initiating, setInitiating] = useState(false);
   const [executing, setExecuting] = useState(false);
+  const [initiateResult, setInitiateResult] = useState<InitiateResult | null>(null);
   const [result, setResult] = useState<PaymentResult | null>(null);
   const alert = useAlert();
 
-  const canExecute = verdict === "EXECUTE" && sts_score >= 750;
+  const canExecute = ["EXECUTE", "TRUSTED", "VERIFIED"].includes(verdict) && sts_score >= 750;
 
-  const handleExecutePayment = async () => {
+  const handleInitiatePayment = async () => {
     if (!canExecute) {
-      await alert.showWarning({
+      // await alert.showWarning({
+      //   title: "Cannot Execute",
+      //   message: "Only positive verdicts (TRUSTED, VERIFIED, EXECUTE) with STS ≥ 750 can proceed",
+      // });
+      Swal.fire({
+        icon: "warning",
         title: "Cannot Execute",
-        message: "Only EXECUTE verdicts with STS ≥ 750 can proceed",
+        text: "Only positive verdicts (TRUSTED, VERIFIED, EXECUTE) with STS ≥ 750 can proceed",
       });
       return;
     }
 
     const confirmed = await alert.showConfirm({
-      title: "Execute Payment?",
-      message: `Execute ₦${(amount / 100).toLocaleString()} payment to ${employee.name}?\n\nAccount: ${employee.account}\nBank: ${employee.bank_code}\nEmployee ID: ${employee.id}`,
-      confirmText: "Execute Payment",
+      title: "Initiate Payment?",
+      message: `Initiate ₦${(amount / 100).toLocaleString()} payment to ${employee.name}?\n\nAccount: ${employee.account}\nBank: ${employee.bank}\nEmployee ID: ${employee.id}`,
+      confirmText: "Initiate",
       cancelText: "Cancel",
     });
+
+    if (!confirmed.isConfirmed) return;
+
+    setInitiating(true);
+    setInitiateResult(null);
+
+    try {
+      // Step 1: Initiate transaction
+      const initiateResponse = await fetch("/api/pay/initiate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          account_number: employee.account,
+          bank_code: employee.bank,
+          amount,
+          employee_id: employee.id,
+          employee_name: employee.name,
+          employee_email: employee.email,
+          verdict,
+          sts_score,
+          remark: `Verified Payroll Initiation - STS: ${sts_score} - Verdict: ${verdict}`,
+        }),
+      });
+
+      const initiateData = await initiateResponse.json();
+      setInitiateResult(initiateData);
+
+      if (!initiateData.success) {
+        // await alert.showError({
+        //   title: "Initiation Failed",
+        //   message: initiateData.message || "Failed to initiate transaction",
+        // });
+        Swal.fire({
+          icon: "error",
+          title: "Initiation Failed",
+          text: initiateData.message || "Failed to initiate transaction",
+        });
+        return;
+      }
+
+      // Step 2: Execute payment after successful initiation
+      await handleExecutePayment(initiateData);
+    } catch (error) {
+      const errorMsg =
+        error instanceof Error ? error.message : "Unknown error";
+      setInitiateResult({
+        success: false,
+        message: errorMsg,
+      });
+      await alert.showError({
+        title: "Initiation Error",
+        message: errorMsg,
+      });
+    } finally {
+      setInitiating(false);
+    }
+  };
+
+  const handleExecutePayment = async (initiateData?: InitiateResult) => {
+    // If called directly without initiation, show error
+    if (!initiateData || !initiateData.success) {
+      // await alert.showError({
+      //   title: "Cannot Execute",
+      //   message: "Transaction must be initiated first",
+      // });
+      Swal.fire({
+        icon: "error",
+        title: "Cannot Execute",
+        text: "Transaction must be initiated first",
+      });
+      return;
+    }
+
+    // const confirmed = await alert.showConfirm({
+    //   title: "Execute Payment?",
+    //   message: `Execute ₦${(amount / 100).toLocaleString()} payment to ${employee.name}?\n\nTransaction Reference: ${initiateData.data?.transaction_reference}\nStatus: Ready for execution`,
+    //   confirmText: "Execute Payment",
+    //   cancelText: "Cancel",
+    // });
+      const confirmed = await Swal.fire({
+        icon: "question",
+        title: "Execute Payment?",
+        text: `Execute ₦${(amount / 100).toLocaleString()} payment to ${employee.name}?\n\nTransaction Reference: ${initiateData.data?.transaction_reference}\nStatus: Ready for execution`,
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Execute Payment",
+        cancelButtonText: "Cancel",
+      });
 
     if (!confirmed.isConfirmed) return;
 
@@ -66,13 +172,15 @@ export function PaymentExecutor({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           account_number: employee.account,
-          bank_code: employee.bank_code,
-          amount, // in kobo
+          bank_code: employee.bank,
+          amount,
           employee_id: employee.id,
           employee_name: employee.name,
           verdict,
           sts_score,
-          remark: `Verified Payroll - STS: ${sts_score} - Verdict: ${verdict}`,
+          transaction_reference: initiateData.data?.transaction_reference,
+          audit_reference: initiateData.data?.audit_reference,
+          remark: `Verified Payroll Execution - STS: ${sts_score} - Verdict: ${verdict}`,
         }),
       });
 
@@ -195,7 +303,7 @@ export function PaymentExecutor({
                 fontFamily: "monospace",
               }}
             >
-              {employee.account} ({employee.bank_code})
+              {employee.account} ({employee.bank})
             </div>
           </div>
           <div>
@@ -259,10 +367,10 @@ export function PaymentExecutor({
         </div>
       </div>
 
-      {/* Action Button */}
+      {/* Action Button - Initiate Payment Flow */}
       <button
-        onClick={handleExecutePayment}
-        disabled={executing || !canExecute}
+        onClick={handleInitiatePayment}
+        disabled={initiating || executing || !canExecute}
         style={{
           width: "100%",
           padding: "12px 16px",
@@ -278,10 +386,10 @@ export function PaymentExecutor({
           justifyContent: "center",
           gap: 8,
           transition: "all 0.2s ease",
-          opacity: executing ? 0.7 : 1,
+          opacity: initiating || executing ? 0.7 : 1,
         }}
         onMouseEnter={(e) => {
-          if (canExecute && !executing) {
+          if (canExecute && !initiating && !executing) {
             e.currentTarget.style.transform = "translateY(-2px)";
             e.currentTarget.style.boxShadow = `0 8px 16px rgba(224, 24, 91, 0.2)`;
           }
@@ -291,7 +399,12 @@ export function PaymentExecutor({
           e.currentTarget.style.boxShadow = "none";
         }}
       >
-        {executing ? (
+        {initiating ? (
+          <>
+            <Loader size={16} style={{ animation: "spin 1s linear infinite" }} />
+            Initiating Transaction...
+          </>
+        ) : executing ? (
           <>
             <Loader size={16} style={{ animation: "spin 1s linear infinite" }} />
             Executing Payment...
@@ -299,10 +412,41 @@ export function PaymentExecutor({
         ) : (
           <>
             <Send size={16} />
-            Execute Payment
+            Initiate Payment
           </>
         )}
       </button>
+
+      {/* Initiation Result Display */}
+      {initiateResult && (
+        <div
+          style={{
+            marginTop: 16,
+            padding: 12,
+            borderRadius: 8,
+            background: initiateResult.success
+              ? `rgba(34, 197, 94, 0.1)`
+              : `rgba(239, 68, 68, 0.1)`,
+            border: `1px solid ${
+              initiateResult.success ? colors.success : colors.error
+            }`,
+            fontSize: 12,
+            color: initiateResult.success ? colors.success : colors.error,
+          }}
+        >
+          <div style={{ fontWeight: 600, marginBottom: 4 }}>
+            {initiateResult.success ? "✓ Transaction Initiated" : "✗ Initiation Failed"}
+          </div>
+          {initiateResult.data?.transaction_reference && (
+            <div style={{ fontFamily: "monospace", fontSize: 11, marginTop: 4 }}>
+              Ref: {initiateResult.data.transaction_reference}
+            </div>
+          )}
+          {initiateResult.message && (
+            <div style={{ marginTop: 4 }}>{initiateResult.message}</div>
+          )}
+        </div>
+      )}
 
       {/* Result Display */}
       {result && (

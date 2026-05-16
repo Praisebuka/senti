@@ -29,6 +29,9 @@ export function EmployeeDetail({ emp, onBack }: EmployeeDetailProps) {
   const [ran, setRan] = useState(false);
   const [comprehensiveLoading, setComprehensiveLoading] = useState(false);
   const [comprehensiveReport, setComprehensiveReport] = useState<VerificationReport | null>(null);
+  const [bankVerificationLoading, setBankVerificationLoading] = useState(false);
+  const [bankVerificationResult, setBankVerificationResult] = useState<any>(null);
+  const [bankVerificationError, setBankVerificationError] = useState<string | null>(null);
 
   useEffect(() => {
     // Auto-verify bank account when component loads
@@ -37,10 +40,22 @@ export function EmployeeDetail({ emp, onBack }: EmployeeDetailProps) {
 
   console.log(emp);
   const runBankVerification = async () => {
+    setBankVerificationLoading(true);
+    setBankVerificationError(null);
     try {
-      await verifyBankAccount(emp.account, emp.bank);
+      const result = await verifyBankAccount(emp.account, emp.bank);
+      if (result.success) {
+        setBankVerificationResult(result.data);
+        console.log("Bank verification successful:", result.data);
+      } else {
+        setBankVerificationError(result.message || "Verification failed");
+        console.error("Bank verification failed:", result.message);
+      }
     } catch (error) {
+      setBankVerificationError(error instanceof Error ? error.message : "Verification error");
       console.error("Bank account verification error:", error);
+    } finally {
+      setBankVerificationLoading(false);
     }
   };
 
@@ -91,6 +106,10 @@ export function EmployeeDetail({ emp, onBack }: EmployeeDetailProps) {
         @keyframes spin {
           from { transform: rotate(0deg); }
           to { transform: rotate(360deg); }
+        }
+        @keyframes pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.5; }
         }
       `}</style>
       <button
@@ -286,6 +305,74 @@ export function EmployeeDetail({ emp, onBack }: EmployeeDetailProps) {
           <span>SQUAD BANK ACCOUNT VERIFICATION</span>
         </div>
 
+        {bankVerificationLoading && (
+          <div
+            style={{
+              padding: 16,
+              textAlign: "center",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 12,
+              marginBottom: 12,
+            }}
+          >
+            <div
+              style={{
+                width: 32,
+                height: 32,
+                borderRadius: "50%",
+                border: `3px solid ${colors.border}`,
+                borderTopColor: colors.primary,
+                animation: "spin 1s linear infinite",
+              }}
+            />
+            <div style={{ color: colors.muted, fontSize: 12 }}>
+              Verifying account details...
+            </div>
+          </div>
+        )}
+
+        {bankVerificationError && (
+          <div
+            style={{
+              padding: 12,
+              background: colors.error + "20",
+              borderRadius: 6,
+              border: `1px solid ${colors.error}40`,
+              fontSize: 12,
+              color: colors.error,
+              marginBottom: 12,
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+            }}
+          >
+            <AlertTriangle size={14} />
+            {bankVerificationError}
+          </div>
+        )}
+
+        {!bankVerificationLoading && bankVerificationResult && (
+          <div
+            style={{
+              padding: 12,
+              background: colors.success + "20",
+              borderRadius: 6,
+              border: `1px solid ${colors.success}40`,
+              fontSize: 12,
+              color: colors.success,
+              marginBottom: 12,
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+            }}
+          >
+            <span>✓</span>
+            Account verified: {bankVerificationResult.account_name}
+          </div>
+        )}
+
         <div
           style={{
             display: "grid",
@@ -312,35 +399,59 @@ export function EmployeeDetail({ emp, onBack }: EmployeeDetailProps) {
           </div>
         </div>
 
-        <div
-          style={{
-            padding: 12,
-            background: colors.warning + "20",
-            borderRadius: 6,
-            border: `1px solid ${colors.warning}40`,
-            fontSize: 12,
-            color: colors.text,
-          }}
-        >
-          Real bank verification is pending account upload and Squad API setup
-        </div>
+        {!bankVerificationResult && !bankVerificationError && !bankVerificationLoading && (
+          <div
+            style={{
+              padding: 12,
+              background: colors.warning + "20",
+              borderRadius: 6,
+              border: `1px solid ${colors.warning}40`,
+              fontSize: 12,
+              color: colors.text,
+            }}
+          >
+            Account verification pending. Click the button below to verify.
+          </div>
+        )}
 
         <button
           onClick={runBankVerification}
+          disabled={bankVerificationLoading}
           style={{
-            background: colors.info,
+            background: bankVerificationLoading ? colors.muted : colors.info,
             color: "#fff",
             fontWeight: 600,
             fontSize: 12,
             padding: "8px 16px",
             borderRadius: 6,
             border: "none",
-            cursor: "pointer",
+            cursor: bankVerificationLoading ? "not-allowed" : "pointer",
             width: "100%",
             marginTop: 12,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 8,
+            opacity: bankVerificationLoading ? 0.7 : 1,
           }}
         >
-          Verify Bank Account
+          {bankVerificationLoading ? (
+            <>
+              <div
+                style={{
+                  width: 12,
+                  height: 12,
+                  borderRadius: "50%",
+                  border: `2px solid rgba(255,255,255,0.3)`,
+                  borderTopColor: "#fff",
+                  animation: "spin 1s linear infinite",
+                }}
+              />
+              Verifying...
+            </>
+          ) : (
+            "Verify Bank Account"
+          )}
         </button>
       </Card>
 
