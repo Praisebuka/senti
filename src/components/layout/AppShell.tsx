@@ -1,5 +1,5 @@
 "use client";
-
+import { AnalyticsDashboard } from "@/components/analytics/AnalyticsDashboard";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -543,26 +543,7 @@ export function AppShell() {
             {view === "credential" && <CredentialVerifier />}
             {view === "sanctions" && <SanctionsTester />}
             {view === "analytics" && (
-              <Card style={{ textAlign: "center", padding: 60 }}>
-                <BarChart3
-                  size={40}
-                  color={colors.muted}
-                  style={{ marginBottom: 12 }}
-                />
-                <div style={{ color: colors.muted, marginBottom: 12 }}>
-                  Advanced Analytics Dashboard
-                </div>
-                <div
-                  style={{
-                    color: colors.textSecondary,
-                    fontSize: 14,
-                    lineHeight: 1.6,
-                  }}
-                >
-                  Real-time insights into employee verification trends, risk
-                  patterns, and compliance metrics across your organization.
-                </div>
-              </Card>
+              <AnalyticsDashboard />
             )}
             {view === "reports" && (
               <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>

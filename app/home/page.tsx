@@ -850,7 +850,7 @@ export default function LandingPage() {
                     <Mail size={20} color={colors.primary} />
                     <div>
                       <div style={{ fontSize: "12px", color: colors.textSecondary, fontWeight: "500" }}>Email</div>
-                      <div style={{ fontSize: "14px", fontWeight: "600" }}>contact@core-connect.com</div>
+                      <div style={{ fontSize: "14px", fontWeight: "600" }}>contact@core-konnect.com</div>
                     </div>
                   </div>
                   <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>

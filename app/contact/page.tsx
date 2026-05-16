@@ -30,7 +30,7 @@ export default function ContactPage() {
     {
       icon: Mail,
       title: "Email",
-      value: "contact@core-connect.com",
+      value: "contact@core-konnect.com",
       description: "We'll respond within 24 hours",
     },
     {

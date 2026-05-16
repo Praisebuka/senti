@@ -1,3 +1,5 @@
+import React from "react";
+import { CSVUpload } from "@/components/upload/CSVUpload";
 import { colors } from "@/constants/colors";
 import { EMPLOYEES, VERDICTS, DEPARTMENT_RISKS } from "@/constants/data";
 import { StatCard, Card } from "@/components/shared";
@@ -41,6 +43,10 @@ export const Dashboard: React.FC = () => {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+      <CSVUpload
+        orgId="demo-org"
+        onUploadComplete={(count) => console.log(`${count} employees loaded`)}
+      />
       <style>{`
         @media (max-width: 500px) {
           .ring_and_co {

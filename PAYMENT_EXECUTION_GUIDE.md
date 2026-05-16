@@ -1,4 +1,4 @@
-# Core-Connect: Payment Execution Demo & Summary
+# Core-Konnect: Payment Execution Demo & Summary
 
 ## 🎯 What's Been Created
 
@@ -38,7 +38,7 @@ POST /api/pay/execute
   "data": {
     "transaction_id": "txn_abc123",
     "squad_reference": "ref_squad_123",
-    "audit_reference": "Core-Connect-EXECUTE|875|EMP-001|1715792400000",
+    "audit_reference": "Core-Konnect-EXECUTE|875|EMP-001|1715792400000",
     "amount": 28500000,
     "account_number": "0123456789",
     "employee_id": "EMP-001",
@@ -89,8 +89,8 @@ POST /api/pay/execute
 ---
 
 ### 4. **One-Page A4 PDF Summary**
-- **File:** `public/Core-Connect-Summary.pdf`
-- **How to Access:** Available at `/Core-Connect-Summary.pdf`
+- **File:** `public/Core-Konnect-Summary.pdf`
+- **How to Access:** Available at `/Core-Konnect-Summary.pdf`
 
 **PDF Contents:**
 - 🎯 **The Problem:** Nigeria loses ₦50B+ annually to payroll fraud
@@ -134,7 +134,7 @@ POST /api/pay/execute
    - **Result:** Transaction ID + Squad reference displayed
 
 5. **Check Audit Trail:**
-   - Audit reference format: `Core-Connect-EXECUTE|872|EMP-001|[timestamp]`
+   - Audit reference format: `Core-Konnect-EXECUTE|872|EMP-001|[timestamp]`
    - Logged to backend for compliance
 
 ---
@@ -255,7 +255,7 @@ Returns: { data: { id, reference } }
 
 **Before:** Manual review of 50k+ employees monthly → slow, error-prone
 
-**After with Core-Connect:**
+**After with Core-Konnect:**
 1. Dashboard shows 50k employees grouped by risk
 2. Auto-execute all TRUSTED (STS ≥ 900) → 40k+ transfers
 3. Manual review only FLAGGED/SUSPECT → 500-1000 employees
@@ -300,7 +300,7 @@ Returns: { data: { id, reference } }
 - **Payment Execution Issues:** Check `app/api/pay/execute/route.ts`
 - **UI Integration:** Check `src/components/employees/PaymentExecutor.tsx`
 - **Squad API Errors:** Verify `SQUAD_SECRET_KEY` and account setup
-- **PDF Access:** Navigate to `/Core-Connect-Summary.pdf`
+- **PDF Access:** Navigate to `/Core-Konnect-Summary.pdf`
 
 ---
 

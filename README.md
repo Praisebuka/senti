@@ -1,8 +1,8 @@
-# 🛡️ Core-Connect: AI-Powered Employee Payroll Verification
+# 🛡️ Core-Konnect: AI-Powered Employee Payroll Verification
 
 **Real-world context:** Government salary fraud costs Nigeria billions annually. Without proper verification, funds are transferred to fraudulent identities, ghost employees, and sanctioned individuals—causing direct harm to legitimate employees who don't receive salaries and taxpayer waste.
 
-**Core-Connect** prevents this by combining AI-driven verification signals with real payment infrastructure (Squad API) to flag high-risk employees before salary transfers execute.
+**Core-Konnect** prevents this by combining AI-driven verification signals with real payment infrastructure (Squad API) to flag high-risk employees before salary transfers execute.
 
 ---
 
@@ -326,7 +326,7 @@ Body: {
   "account": "0123456789",
   "bank_code": "GTBank",
   "amount": "285000" (in kobo),
-  "ref": "Core-Connect-TRUSTED|872|EMP-001"
+  "ref": "Core-Konnect-TRUSTED|872|EMP-001"
 }
 ```
 - **Status:** Prepared (not executed in UI)

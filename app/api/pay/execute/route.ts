@@ -35,22 +35,7 @@ export async function POST(req: NextRequest) {
 
     // Use audit reference from initiation if provided, otherwise generate new one
     const sts_score = body.sts_score || 0;
-    const audit_ref = body.audit_reference || `Core-Connect-${body.verdict}|${sts_score}|${body.employee_id}|${Date.now()}`;
-    const transaction_ref = body.transaction_reference;
-
-    // Build payload for execution
-    const executePayload: any = {
-      account: body.account_number,
-      bank_code: body.bank_code,
-      amount: body.amount, // in kobo (smallest unit)
-      ref: audit_ref,
-      remark: body.remark || "Verified Payroll Execution - Core-Connect",
-    };
-
-    // If transaction reference from initiation exists, include it
-    if (transaction_ref) {
-      executePayload.transaction_ref = transaction_ref;
-    }
+    const audit_ref = `Core-Konnect-${body.verdict}|${sts_score}|${body.employee_id}|${Date.now()}`;
 
     // Call Squad's Transfer API
     const response = await fetch(`${SQUAD_BASE_URL}/payout/transfer`, {
@@ -59,7 +44,13 @@ export async function POST(req: NextRequest) {
         Authorization: `Bearer ${SQUAD_API_KEY}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(executePayload),
+      body: JSON.stringify({
+        account: body.account_number,
+        bank_code: body.bank_code,
+        amount: body.amount, // in kobo (smallest unit)
+        ref: audit_ref,
+        remark: body.remark || "Verified Payroll - Core-Konnect",
+      }),
     });
 
     const data = await response.json();

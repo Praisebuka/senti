@@ -9,6 +9,23 @@ import { BVNVerificationResult, SanctionsCheckResult } from "@/types";
 const SQUAD_API_KEY = process.env.SQUAD_SECRET_KEY || "sandbox_sk_756c60d1310ebad20425ba78dd69c2c2c45b1e1f36d2";
 const SQUAD_BASE_URL = "https://sandbox-api-d.squadco.com"; // Updated: Real Squad endpoint
 
+export const BANK_CODES: Record<string, string> = {
+  "GTBank": "058",
+  "Access": "044",
+  "Zenith": "057",
+  "UBA": "033",
+  "First Bank": "011",
+  "Fidelity": "070",
+  "Polaris": "076",
+  "Sterling": "232",
+  "Kuda": "090267",
+  "Opay": "100004",
+  "Moniepoint": "090405",
+};
+
+export function getBankCode(bankName: string): string {
+  return BANK_CODES[bankName] ?? "000";
+}
 /**
  * REAL SQUAD API: Account Lookup
  * Verifies bank account details (account name, number, bank code)

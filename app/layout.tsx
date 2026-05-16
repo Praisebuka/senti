@@ -5,7 +5,7 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Core-Connect - Squad Payroll Verification",
+  title: "Core-Konnect - Squad Payroll Verification",
   description: "AI-powered employee payroll verification system by 0x1337",
 };
 

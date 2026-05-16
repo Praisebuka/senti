@@ -13,7 +13,7 @@ export async function GET() {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Core-Connect Solution Summary</title>
+  <title>Core-Konnect Solution Summary</title>
   <style>
     @media print {
       body { margin: 0; padding: 0; }
@@ -204,7 +204,7 @@ export async function GET() {
     <section>
       <h2>The Solution</h2>
       <div class="solution">
-        <strong>Core-Connect</strong> combines AI-driven verification signals with real payment infrastructure (Squad API) to flag high-risk employees <strong>before salary transfer executes</strong>. Multi-dimensional risk scoring prevents fraud at the source.
+        <strong>Core-Konnect</strong> combines AI-driven verification signals with real payment infrastructure (Squad API) to flag high-risk employees <strong>before salary transfer executes</strong>. Multi-dimensional risk scoring prevents fraud at the source.
       </div>
     </section>
 
@@ -267,7 +267,7 @@ export async function GET() {
     return new NextResponse(htmlContent, {
       headers: {
         "Content-Type": "text/html; charset=utf-8",
-        "Content-Disposition": 'inline; filename="Core-Connect-Summary.html"',
+        "Content-Disposition": 'inline; filename="Core-Konnect-Summary.html"',
       },
     });
   } catch (error) {
