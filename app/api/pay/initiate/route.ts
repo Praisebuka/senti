@@ -34,11 +34,11 @@ export async function POST(req: NextRequest) {
 
     // Call Squad's Transaction Initiate API
     const response = await fetch(
-      `${SQUAD_BASE_URL}/transactions/initiate`,
+      `${SQUAD_BASE_URL}/transaction/initiate`,
       {
         method: "POST",
         headers: {
-          Authorization: SQUAD_API_KEY || "",
+          Authorization: `Bearer ${SQUAD_API_KEY || ""}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
