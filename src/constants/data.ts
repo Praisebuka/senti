@@ -1,7 +1,7 @@
 import { Employee, DepartmentRisk } from "@/types";
 
 export const EMPLOYEES: Employee[] = [
-  { id:"EMP-001", name:"Adaeze Okonkwo",   dept:"Education",    grade:9,  salary:285000, bvn:"22187654321", account:"0123456789", bank:"GTBank",    sts:872, behavioural:91, document:88, network:84, verdict:"TRUSTED",   flags:[] },
+  { id:"EMP-001", name:"Adaeze Okonkwo",   dept:"Education",    grade:9,  salary:285000, bvn:"22187654321", account:"0123456789", bank:"000001",    sts:872, behavioural:91, document:88, network:84, verdict:"TRUSTED",   flags:[] },
   { id:"EMP-002", name:"Musa Lawal",        dept:"Health",       grade:7,  salary:198000, bvn:"22198765432", account:"0234567890", bank:"Access",    sts:763, behavioural:79, document:82, network:71, verdict:"VERIFIED",  flags:[] },
   { id:"EMP-003", name:"Chioma Nwosu",      dept:"Finance",      grade:12, salary:420000, bvn:"22209876543", account:"0345678901", bank:"Zenith",    sts:541, behavioural:52, document:68, network:49, verdict:"REVIEW",    flags:["Salary-grade mismatch","Record edited 2 days before payday"] },
   { id:"EMP-004", name:"Emeka Obi",         dept:"Works",        grade:6,  salary:175000, bvn:"22187654321", account:"0456789012", bank:"UBA",       sts:198, behavioural:11, document:34, network:8, verdict:"FLAGGED",   flags:["BVN shared with EMP-001","Salary withdrawn within 4 min of credit","No attendance log in 7 months"] },

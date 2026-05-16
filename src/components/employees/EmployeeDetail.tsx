@@ -35,6 +35,7 @@ export function EmployeeDetail({ emp, onBack }: EmployeeDetailProps) {
     runBankVerification();
   }, [emp.account, emp.bank]);
 
+  console.log(emp);
   const runBankVerification = async () => {
     try {
       await verifyBankAccount(emp.account, emp.bank);
