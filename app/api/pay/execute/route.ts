@@ -64,7 +64,7 @@ export async function POST(req: NextRequest) {
             error_code: data.code,
             error_details: data.message,
             audit_ref,
-            transaction_ref,
+            transaction_ref: body.transaction_reference ?? data?.transaction_ref ?? null,
           },
         },
         { status: response.status }
