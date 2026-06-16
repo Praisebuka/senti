@@ -12,10 +12,13 @@
     "@supabase/supabase-js": "^2.105.4",
     "lucide-react": "^0.263.0",
     "next": "^14.0.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
+    "pptxgenjs": "^4.0.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-icons": "^4.12.0",
     "recharts": "^2.10.0",
     "supabase": "^2.98.2",
+    "svg2img": "^1.0.0-beta.2",
     "sweetalert2": "^11.26.24"
   },
   "devDependencies": {
